@@ -2590,6 +2590,45 @@ void idMaterial::ParseMaterial( idLexer& src )
 			newSrc.FreeSource();
 			continue;
 		}
+		// Admer: pbrParams 1.0 0.5
+		// It's really just a shortcut for rmaoMap fromRGB_RMAO( r, m, 1.0 )
+		else if ( !token.Icmp( "pbrParams" ) || !token.Icmp( "rmaoParams" ) )
+		{
+			float roughness = 1.0f, metallic = -1.0f;
+
+			if ( !src.ReadTokenOnLine( &token ) )
+			{
+				common->Warning( "pbrParams: missing roughness parameter, ignoring\n" );
+				continue;
+			}
+			roughness = token.GetFloatValue();
+
+			if ( !src.ReadTokenOnLine( &token ) )
+			{
+				common->Warning( "pbrParams: missing metallic parameter, setting to 0.0\n" );
+				metallic = 0.0f;
+			}
+
+			if ( metallic == -1.0f )
+			{
+				metallic = token.GetFloatValue();
+			}
+
+			// Generate the RMAO texture based on pbrParams values
+			idStr::snPrintf( buffer, sizeof( buffer ), "map fromRGB_RMAO( %1.3f, %1.3f, 1.0 )", roughness, metallic );
+			newSrc.LoadMemory( buffer, strlen( buffer ), "pbrParams1" );
+			newSrc.SetFlags( LEXFL_NOFATALERRORS | LEXFL_NOSTRINGCONCAT | LEXFL_NOSTRINGESCAPECHARS | LEXFL_ALLOWPATHNAMES );
+			str = R_ParsePastImageProgram( newSrc );
+			newSrc.FreeSource();
+
+			// Apply it
+			idStr::snPrintf( buffer, sizeof( buffer ), "blend rmaomap\nmap %s\n}\n", str );
+			newSrc.LoadMemory( buffer, strlen( buffer ), "pbrParams2" );
+			newSrc.SetFlags( LEXFL_NOFATALERRORS | LEXFL_NOSTRINGCONCAT | LEXFL_NOSTRINGESCAPECHARS | LEXFL_ALLOWPATHNAMES );
+			ParseStage( newSrc, trpDefault );
+			newSrc.FreeSource();
+			continue;
+		}
 		// normalmap for stage shortcut
 		else if( !token.Icmp( "bumpmap" ) || !token.Icmp( "normalmap" ) )
 		{

@@ -887,7 +887,7 @@ private:
 	bool				CheckSurfaceParm( idToken* token );
 	int					GetExpressionConstant( float f );
 	int					GetExpressionTemporary();
-	expOp_t*				GetExpressionOp();
+	expOp_t*			GetExpressionOp();
 	int					EmitOp( int a, int b, expOpType_t opType );
 	int					ParseEmitOp( idLexer& src, int a, expOpType_t opType, int priority );
 	int					ParseTerm( idLexer& src );
