@@ -424,6 +424,9 @@ static void MatchAndAppendToken( idLexer& src, const char* match )
 	idStr::Append( parseBuffer, MAX_IMAGE_NAME, match );
 }
 
+static float gRed, gGreen, gBlue;
+static bool gIsRmao;
+
 /*
 ===================
 R_ParseImageProgram_r
@@ -457,6 +460,93 @@ static bool R_ParseImageProgram_r( idLexer& src, byte** pic, int* width, int* he
 	}
 
 	AppendToken( token );
+
+	// Admer: quite a utility
+	// map FromRgb( 0.5, 0.25, 0 )
+	// TODO: move to R_LoadImage?
+	if ( !token.Icmpn( "fromRgb", 7 ) )
+	{
+		float red, green, blue;
+
+		gRed = gGreen = gBlue = 0.0f;
+		gIsRmao = false;
+
+		if ( !token.Icmp( "fromRgb_Rmao" ) )
+		{
+			gIsRmao = true;
+		}
+
+		{
+			// Expect a (
+			MatchAndAppendToken( src, "(" );
+
+			// Read red
+			src.ReadToken( &token );
+			red = token.GetFloatValue();
+
+			if ( red < 0.0f ) red = 0.0f;
+			if ( red > 1.0f ) red = 1.0f;
+
+			MatchAndAppendToken( src, "," );
+
+			// Read green
+			src.ReadToken( &token );
+			green = token.GetFloatValue();
+
+			if ( green < 0.0f ) green = 0.0f;
+			if ( green > 1.0f ) green = 1.0f;
+
+			MatchAndAppendToken( src, "," );
+
+			// Read blue
+			src.ReadToken( &token );
+			blue = token.GetFloatValue();
+
+			if ( blue < 0.0f ) blue = 0.0f;
+			if ( blue > 1.0f ) blue = 1.0f;
+
+			// Expect a )
+			MatchAndAppendToken( src, ")" );
+		}
+
+		idStr imageName = idStr( "_r" ) + idStr( (int)(red * 1000) )
+			+ idStr( "g" ) + idStr( (int)(green * 1000) )
+			+ idStr( "b" ) + idStr( (int)(blue * 1000) );
+
+		// Must follow the PBR hack
+		if ( gIsRmao )
+		{
+			imageName += "_rmao";
+		}
+
+		// Super duper ugly, but eh, I'll fix this later,
+		// with something more proper
+		gRed = red;
+		gGreen = green;
+		gBlue = blue;
+
+		// Lambda expressions in action hell yea
+		globalImages->ImageFromFunction( imageName, []( idImage* image )
+		{
+			 byte data[4];
+			 data[0] = gRed * 255;
+			 data[1] = gGreen * 255;
+			 data[2] = gBlue * 255;
+			 data[3] = 255;
+
+			 image->GenerateImage( data, 1, 1, TF_DEFAULT, TR_REPEAT, gIsRmao ? TD_SPECULAR_PBR_RMAO : TD_DEFAULT );
+		} );
+
+		common->DPrintf( "Using custom image '%s', color %3.2f %3.2f %3.2f\n", imageName, red, green, blue );
+
+		// Reset the parse buffer
+		parseBuffer[0] = 0;
+
+		// Save the image name
+		idStr::Append( parseBuffer, MAX_IMAGE_NAME, imageName );
+
+		return true;
+	}
 
 	if( !token.Icmp( "heightmap" ) )
 	{
