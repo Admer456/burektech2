@@ -157,6 +157,7 @@ typedef struct renderEntity_s
 	// all the lights in the moving monorail don't touch the meshes
 
 	bool					weaponDepthHack;		// squash depth range so view weapons don't poke into walls
+	bool					weaponFov;				// use g_weaponFov instead of g_fov
 	// this automatically implies noShadow
 	bool					noOverlays;				// force no overlays on this model
 	bool					skipMotionBlur;			// Mask out this object during motion blur
@@ -247,8 +248,9 @@ typedef struct renderView_s
 	// player views will set this to a non-zero integer for model suppress / allow
 	// subviews (mirrors, cameras, etc) will always clear it to zero
 	int						viewID;
-
+	
 	float					fov_x, fov_y;		// in degrees
+	float					weaponFov_x, weaponFov_y; // Admer: weapons have a different FOV than the view for aesthetic reasons
 	idVec3					vieworg;			// has already been adjusted for stereo world seperation
 	idVec3					vieworg_weapon;		// has already been adjusted for stereo world seperation
 	idMat3					viewaxis;			// transformation matrix, view looks down the positive X axis

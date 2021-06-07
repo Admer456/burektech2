@@ -409,6 +409,9 @@ idCVar r_centerY( "r_centerY", "0", CVAR_FLOAT, "projection matrix center adjust
 
 void R_SetupProjectionMatrix( viewDef_t* viewDef )
 {
+	// Weapon projection matrix
+	float weaponMatrix[16];
+
 	// random jittering is usefull when multiple
 	// frames are going to be blended together
 	// for motion blurred anti-aliasing
@@ -493,6 +496,45 @@ void R_SetupProjectionMatrix( viewDef_t* viewDef )
 		viewDef->projectionMatrix[1 * 4 + 1] = -viewDef->projectionMatrix[1 * 4 + 1];
 		viewDef->projectionMatrix[1 * 4 + 3] = -viewDef->projectionMatrix[1 * 4 + 3];
 	}
+
+	// Copy the main projection matrix to the weapon matrix, so we can only change the relevant parts
+	memcpy( weaponMatrix, viewDef->projectionMatrix, sizeof( weaponMatrix ) );
+
+	// Change the relevant data
+	ymax = zNear * tan( viewDef->renderView.weaponFov_y * idMath::PI / 360.0f );
+	ymin = -ymax;
+
+	xmax = zNear * tan( viewDef->renderView.weaponFov_x * idMath::PI / 360.0f );
+	xmin = -xmax;
+
+	const float weaponWidth = xmax - xmin;
+	const float weaponHeight = ymax - ymin;
+
+	jitterx = jitterx * weaponWidth / viewWidth;
+	jitterx += r_centerX.GetFloat();
+	jitterx += viewDef->renderView.stereoScreenSeparation;
+	xmin += jitterx * weaponWidth;
+	xmax += jitterx * weaponWidth;
+
+	jittery = jittery * weaponHeight / viewHeight;
+	jittery += r_centerY.GetFloat();
+	ymin += jittery * weaponHeight;
+	ymax += jittery * weaponHeight;
+
+	// Change the relevant parts of the matrix
+	weaponMatrix[0 * 4 + 0] = 2.0f * zNear / weaponWidth;
+	weaponMatrix[2 * 4 + 0] = (xmax + xmin) / weaponWidth;	// normally 0
+	
+	// RB: Y axis now points down the screen
+#if defined(USE_VULKAN)
+	weaponMatrix[1 * 4 + 1] = -2.0f * zNear / weaponHeight;
+#else
+	weaponMatrix[1 * 4 + 1] = 2.0f * zNear / weaponHeight;
+#endif
+	weaponMatrix[2 * 4 + 1] = (ymax + ymin) / weaponHeight;	// normally 0
+
+	// Set up the weapon projection matrix
+	idRenderMatrix::Transpose( *(idRenderMatrix*)weaponMatrix, viewDef->weaponProjectionMatrix );
 }
 
 
@@ -568,7 +610,6 @@ void R_SetupUnprojection( viewDef_t* viewDef )
 {
 	R_MatrixFullInverse( viewDef->projectionMatrix, viewDef->unprojectionToCameraMatrix );
 	idRenderMatrix::Transpose( *( idRenderMatrix* )viewDef->unprojectionToCameraMatrix, viewDef->unprojectionToCameraRenderMatrix );
-
 
 	R_MatrixMultiply( viewDef->worldSpace.modelViewMatrix, viewDef->projectionMatrix, viewDef->unprojectionToWorldMatrix );
 	R_MatrixFullInverse( viewDef->unprojectionToWorldMatrix, viewDef->unprojectionToWorldMatrix );

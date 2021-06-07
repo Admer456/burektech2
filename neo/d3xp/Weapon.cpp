@@ -2675,6 +2675,9 @@ void idWeapon::PresentWeapon( bool showViewModel )
 	// crunch the depth range so it never pokes into walls this breaks the machine gun gui
 	renderEntity.weaponDepthHack = g_useWeaponDepthHack.GetBool();
 
+	// Use g_weaponFov instead of g_fov
+	renderEntity.weaponFov = true;
+
 	// present the model
 	if( showViewModel )
 	{

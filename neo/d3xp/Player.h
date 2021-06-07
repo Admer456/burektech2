@@ -525,6 +525,7 @@ public:
 
 	float					DefaultFov() const;
 	float					CalcFov( bool honorZoom );
+	float					CalcWeaponFov();
 	void					CalculateViewWeaponPos( idVec3& origin, idMat3& axis );
 	idVec3					GetEyePosition() const;
 	void					GetViewPos( idVec3& origin, idMat3& axis ) const;

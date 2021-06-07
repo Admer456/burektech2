@@ -377,6 +377,7 @@ void R_AddSingleModel( viewEntity_t* vEntity )
 	vEntity->useLightGrid = false;
 
 	// globals we really should pass in...
+	// Admer: this must remain const. If this is modified, then R_AddSingleModel will bug out if run in parallel
 	const viewDef_t* viewDef = tr.viewDef;
 
 	idRenderEntityLocal* entityDef = vEntity->entityDef;
@@ -575,7 +576,6 @@ void R_AddSingleModel( viewEntity_t* vEntity )
 		}
 	}
 
-
 	// RB end
 
 	//---------------------------
@@ -589,14 +589,21 @@ void R_AddSingleModel( viewEntity_t* vEntity )
 	memcpy( vEntity->modelMatrix, entityDef->modelMatrix, sizeof( vEntity->modelMatrix ) );
 	R_MatrixMultiply( entityDef->modelMatrix, viewDef->worldSpace.modelViewMatrix, vEntity->modelViewMatrix );
 
+	// Admer: This should be a parallel-friendly way to have a separate weapon FOV
+	// weaponProjectionMatrix is set up in the same place as viewDef->projectionMatrix
+	const idRenderMatrix& projectionMatrix = 
+		renderEntity->weaponFov ? viewDef->weaponProjectionMatrix : viewDef->projectionRenderMatrix;
+
 	idRenderMatrix viewMat;
 	idRenderMatrix::Transpose( *( idRenderMatrix* )vEntity->modelViewMatrix, viewMat );
-	idRenderMatrix::Multiply( viewDef->projectionRenderMatrix, viewMat, vEntity->mvp );
-	if( renderEntity->weaponDepthHack )
+	idRenderMatrix::Multiply( projectionMatrix, viewMat, vEntity->mvp );
+
+	if ( renderEntity->weaponDepthHack )
 	{
 		idRenderMatrix::ApplyDepthHack( vEntity->mvp );
 	}
-	if( renderEntity->modelDepthHack != 0.0f )
+
+	if ( renderEntity->modelDepthHack != 0.0f )
 	{
 		idRenderMatrix::ApplyModelDepthHack( vEntity->mvp, renderEntity->modelDepthHack );
 	}

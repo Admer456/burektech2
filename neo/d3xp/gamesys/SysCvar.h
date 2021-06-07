@@ -208,6 +208,7 @@ extern idCVar	g_gunScale;
 extern idCVar	g_viewNodalX;
 extern idCVar	g_viewNodalZ;
 extern idCVar	g_fov;
+extern idCVar	g_weaponFov;
 extern idCVar	g_testDeath;
 extern idCVar	g_skipViewEffects;
 extern idCVar   g_mpWeaponAngleScale;

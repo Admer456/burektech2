@@ -10220,6 +10220,18 @@ float idPlayer::CalcFov( bool honorZoom )
 }
 
 /*
+====================
+idPlayer::CalcWeaponFov
+
+Fixed fov at intermissions, otherwise account for fov variable and zooms.
+====================
+*/
+float idPlayer::CalcWeaponFov()
+{
+	return g_weaponFov.GetFloat();
+}
+
+/*
 ==============
 idPlayer::GunTurningOffset
 
@@ -10662,6 +10674,7 @@ void idPlayer::CalculateRenderView()
 		}
 
 		gameLocal.CalcFov( CalcFov( true ), renderView->fov_x, renderView->fov_y );
+		gameLocal.CalcFov( CalcWeaponFov(), renderView->weaponFov_x, renderView->weaponFov_y );
 	}
 
 	if( renderView->fov_y == 0 )
