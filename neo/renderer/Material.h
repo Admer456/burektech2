@@ -97,7 +97,8 @@ typedef enum
 	DI_CUBE_RENDER,
 	DI_MIRROR_RENDER,
 	DI_XRAY_RENDER,
-	DI_REMOTE_RENDER
+	DI_REMOTE_RENDER,
+	DI_GUI_RENDER // Admer: so we can render GUIs to images
 } dynamicidImage_t;
 
 // note: keep opNames[] in sync with changes
@@ -298,7 +299,8 @@ typedef enum
 	MF_LOD2						= BIT( 8 ),	 // motorsep 11-24-2014; material flag for LOD2 iteration
 	MF_LOD3						= BIT( 9 ),	 // motorsep 11-24-2014; material flag for LOD3 iteration
 	MF_LOD4						= BIT( 10 ), // motorsep 11-24-2014; material flag for LOD4 iteration
-	MF_LOD_PERSISTENT			= BIT( 11 )	 // motorsep 11-24-2014; material flag for persistent LOD iteration
+	MF_LOD_PERSISTENT			= BIT( 11 ), // motorsep 11-24-2014; material flag for persistent LOD iteration
+	MF_GUITARGET				= BIT( 12 )  // Admer: this GUI surface is used to compute a GUI render map, but a GUI should NOT be drawn on it
 } materialFlags_t;
 
 // contents flags, NOTE: make sure to keep the defines in doom_defs.script up to date with these!

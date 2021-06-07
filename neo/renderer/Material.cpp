@@ -1435,8 +1435,12 @@ void idMaterial::ParseStage( idLexer& src, const textureRepeat_t trpDefault )
 
 		if( !token.Icmp( "map" ) )
 		{
-			str = R_ParsePastImageProgram( src );
-			idStr::Copynz( imageName, str, sizeof( imageName ) );
+			// GUI target materials don't need a manual map to be specified - they generate their own
+			if ( !TestMaterialFlag( MF_GUITARGET ) )
+			{
+				str = R_ParsePastImageProgram( src );
+				idStr::Copynz( imageName, str, sizeof( imageName ) );
+			}
 			continue;
 		}
 
@@ -1465,6 +1469,34 @@ void idMaterial::ParseStage( idLexer& src, const textureRepeat_t trpDefault )
 			ts->texgen = TG_SCREEN;
 			continue;
 		}
+
+		if ( !token.Icmp( "guiRenderMap" ) )
+		{
+			SetMaterialFlag( MF_GUITARGET );
+
+			ts->dynamic = DI_GUI_RENDER;
+			ts->width = src.ParseInt();
+			ts->height = src.ParseInt();
+
+			// guiRenderMap forces that the texture 
+			// repeats, else we'd have some issues
+			trp = TR_REPEAT;
+			
+			idStr dynamicImageName = GetName() + idStr( "_dyn" );
+
+			// Is this optimisation needed? Dunno...
+			//dynamicImageName.Replace( "textures/", "" ); // assuming the name starts with "textures/"
+
+			// Generate an image and resize it to exactly what we need
+			idImage* renderTargetImage = globalImages->ImageFromFile( dynamicImageName, TF_LINEAR, TR_REPEAT, TD_DEFAULT );
+			renderTargetImage->Resize( ts->width, ts->height );
+
+			idStr::Copynz( imageName, dynamicImageName, 256 );
+
+			ts->image = renderTargetImage;
+			continue;
+		}
+
 		if( !token.Icmp( "screen" ) )
 		{
 			ts->texgen = TG_SCREEN;
@@ -1979,7 +2011,7 @@ void idMaterial::ParseStage( idLexer& src, const textureRepeat_t trpDefault )
 	}
 
 	// now load the image with all the parms we parsed
-	if( imageName[0] )
+	if( imageName[0] && !TestMaterialFlag( MF_GUITARGET ) )
 	{
 		ts->image = globalImages->ImageFromFile( imageName, tf, trp, td, cubeMap );
 		if( !ts->image )

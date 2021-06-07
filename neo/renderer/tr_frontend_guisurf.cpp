@@ -144,7 +144,7 @@ static void R_RenderGuiSurf( idUserInterface* gui, const drawSurf_t* drawSurf )
 	}
 
 	// don't allow an infinite recursion loop
-	if( tr.guiRecursionLevel == 4 )
+	if( tr.guiRecursionLevel >= MAX_GUI_RECURSION )
 	{
 		return;
 	}
@@ -207,6 +207,13 @@ void R_AddInGameGuis( const drawSurf_t* const drawSurfs[], const int numDrawSurf
 		const drawSurf_t* drawSurf = drawSurfs[i];
 		idUserInterface* gui = drawSurf->material->GlobalGui();
 
+		// Do not actually render this surface I
+		// It only exists so we can render a GUI into a texture
+		if ( drawSurf->material->TestMaterialFlag( MF_GUITARGET ) )
+		{
+			continue;
+		}
+	
 		int guiNum = drawSurf->material->GetEntityGui() - 1;
 		if( guiNum >= 0 && guiNum < MAX_RENDERENTITY_GUI )
 		{

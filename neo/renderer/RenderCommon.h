@@ -822,6 +822,8 @@ class idParallelJobList;
 const int MAX_GUI_SURFACES	= 1024;		// default size of the drawSurfs list for guis, will
 // be automatically expanded as needed
 
+const int MAX_GUI_RECURSION = 4;
+
 static const int MAX_RENDER_CROPS = 8;
 
 #include "RenderBackend.h"

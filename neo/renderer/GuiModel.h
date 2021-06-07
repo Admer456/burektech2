@@ -58,6 +58,7 @@ public:
 
 	void		EmitToCurrentView( float modelMatrix[16], bool depthHack );
 	void		EmitFullScreen();
+	void		EmitToGuiTarget();
 
 	// RB
 	void		EmitImGui( ImDrawData* drawData );

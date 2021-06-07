@@ -442,6 +442,96 @@ void R_XrayRender( const drawSurf_t* surf, textureStage_t* stage, idScreenRect s
 	tr.UnCrop();
 }
 
+// Should probably belong to tr_frontend_guisurf.cpp
+// but it's only used here thus far
+void R_RenderGui2D( idUserInterface* gui, float width, float height )
+{
+	SCOPED_PROFILE_EVENT( "R_Render2DGui_individual" );
+
+	// for testing the performance hit
+	if ( r_skipGuiShaders.GetInteger() == 1 )
+	{
+		return;
+	}
+
+	// don't allow an infinite recursion loop
+	if ( tr.guiRecursionLevel >= MAX_GUI_RECURSION )
+	{
+		return;
+	}
+
+	tr.pc.c_guiSurfs++;
+	tr.guiRecursionLevel++;
+
+	tr.guiModel->Clear();
+	gui->Redraw( tr.viewDef->renderView.time[0] ); // Issue the GUI render commands
+	tr.guiModel->EmitToGuiTarget(); // Emit the GUI in full screen
+	tr.guiModel->Clear();
+
+	tr.guiRecursionLevel--;
+}
+
+/*
+==================
+R_GuiRender
+Admer: so we can render GUIs into dynamic textures
+
+Quick walkthrough:
+1. Set up the render view, y'know, crop it, set the view origin to 0,0,0 and stuff
+2. Grab the GUI, bail out if there's none
+3. Set up a projection matrix for the GUI so that it renders right in front, across the whole screen
+4. Render the GUI and copy that to a texture
+
+The effect is that we'll get a dynamic texture that represents the GUI, and that will be wrapped
+on a curved monitor surface. For flat monitors, you may just wanna use regular, projected GUI surfaces.
+==================
+*/
+static void R_GuiRender( const drawSurf_t* surf, textureStage_t* stage )
+{
+	// Don't try rendering it again in the same frame
+	// if some other material also happens to be using it
+	if ( stage->dynamicFrameCount == tr.frameCount )
+	{
+		return;
+	}
+
+	// Crop the view
+	int stageWidth = stage->width;
+	int stageHeight = stage->height;
+	tr.CropRenderSize( stageWidth, stageHeight );
+
+	// Get the GUI
+	idUserInterface* gui = nullptr;
+	int guiNum = surf->material->GetEntityGui() - 1;
+	if ( guiNum >= 0 && guiNum < MAX_RENDERENTITY_GUI )
+	{
+		if ( surf->space->entityDef )
+		{
+			gui = surf->space->entityDef->parms.gui[guiNum];
+		}
+	}
+
+	// If it's not there, bail out
+	if ( nullptr == gui )
+	{
+		common->Warning( "gui = nullptr\n" );
+		return;
+	}
+
+	// Render the GUI
+	R_RenderGui2D( gui, stageWidth, stageHeight );
+
+	// copy this rendering to the image
+	stage->dynamicFrameCount = tr.frameCount;
+	if ( stage->image == NULL )
+	{
+		stage->image = globalImages->scratchImage;
+	}
+
+	tr.CaptureRenderToImage( stage->image->GetName(), true );
+	tr.UnCrop();
+}
+
 /*
 ==================
 R_GenerateSurfaceSubview
@@ -518,6 +608,10 @@ bool R_GenerateSurfaceSubview( const drawSurf_t* drawSurf )
 
 				case DI_XRAY_RENDER:
 					R_XrayRender( drawSurf, const_cast<textureStage_t*>( &stage->texture ), scissor );
+					break;
+
+				case DI_GUI_RENDER: // Admer: GUI-to-texture rendering
+					R_GuiRender( drawSurf, const_cast<textureStage_t*>( &stage->texture ) );
 					break;
 			}
 		}

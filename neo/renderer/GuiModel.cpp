@@ -333,6 +333,113 @@ void idGuiModel::EmitFullScreen()
 	R_AddDrawViewCmd( viewDef, true );
 }
 
+// Admer begin
+/*
+================
+idGuiModel::EmitToGuiTarget
+================
+*/
+void idGuiModel::EmitToGuiTarget()
+{
+	if ( surfaces[0].numIndexes == 0 )
+	{
+		return;
+	}
+
+	SCOPED_PROFILE_EVENT( "Gui::EmitFullScreen" );
+
+	viewDef_t* viewDef = (viewDef_t*)R_ClearedFrameAlloc( sizeof( *viewDef ), FRAME_ALLOC_VIEW_DEF );
+	viewDef->is2Dgui = true;
+	tr.GetCroppedViewport( &viewDef->viewport );
+
+	bool stereoEnabled = (renderSystem->GetStereo3DMode() != STEREO3D_OFF);
+	if ( stereoEnabled )
+	{
+		const float screenSeparation = GetScreenSeparationForGuis();
+
+		// this will be negated on the alternate eyes, both rendered each frame
+		viewDef->renderView.stereoScreenSeparation = screenSeparation;
+
+		extern idCVar stereoRender_swapEyes;
+		viewDef->renderView.viewEyeBuffer = 0;	// render to both buffers
+		if ( stereoRender_swapEyes.GetBool() )
+		{
+			viewDef->renderView.stereoScreenSeparation = -screenSeparation;
+		}
+	}
+
+	viewDef->scissor.x1 = 0;
+	viewDef->scissor.y1 = 0;
+	viewDef->scissor.x2 = viewDef->viewport.x2 - viewDef->viewport.x1;
+	viewDef->scissor.y2 = viewDef->viewport.y2 - viewDef->viewport.y1;
+
+	// RB: IMPORTANT - the projectionMatrix has a few changes to make it work with Vulkan
+	viewDef->projectionMatrix[0 * 4 + 0] = 2.0f / 640.0f; // GUIs are 640x480, so divide by that
+	viewDef->projectionMatrix[0 * 4 + 1] = 0.0f;
+	viewDef->projectionMatrix[0 * 4 + 2] = 0.0f;
+	viewDef->projectionMatrix[0 * 4 + 3] = 0.0f;
+
+	viewDef->projectionMatrix[1 * 4 + 0] = 0.0f;
+#if defined(USE_VULKAN)
+	viewDef->projectionMatrix[1 * 4 + 1] = 2.0f / 480.0f;
+#else
+	viewDef->projectionMatrix[1 * 4 + 1] = 2.0f / 480.0f;
+#endif
+	viewDef->projectionMatrix[1 * 4 + 2] = 0.0f;
+	viewDef->projectionMatrix[1 * 4 + 3] = 0.0f;
+
+	viewDef->projectionMatrix[2 * 4 + 0] = 0.0f;
+	viewDef->projectionMatrix[2 * 4 + 1] = 0.0f;
+	viewDef->projectionMatrix[2 * 4 + 2] = -1.0f; // Depth, no need to touch that
+	viewDef->projectionMatrix[2 * 4 + 3] = 0.0f;
+
+	viewDef->projectionMatrix[3 * 4 + 0] = -1.0f; // RB: was -2.0f
+#if defined(USE_VULKAN)
+	viewDef->projectionMatrix[3 * 4 + 1] = 1.0f; // Admer: was -1.0f
+#else
+	viewDef->projectionMatrix[3 * 4 + 1] = -1.0f; // Admer: was 1.0f, this flips the vertical axis
+#endif
+	viewDef->projectionMatrix[3 * 4 + 2] = 0.0f; // RB: was 1.0f
+	viewDef->projectionMatrix[3 * 4 + 3] = 1.0f;
+
+	// make a tech5 renderMatrix for faster culling
+	idRenderMatrix::Transpose( *(idRenderMatrix*)viewDef->projectionMatrix, viewDef->projectionRenderMatrix );
+
+	viewDef->worldSpace.modelMatrix[0 * 4 + 0] = 1.0f;
+	viewDef->worldSpace.modelMatrix[1 * 4 + 1] = 1.0f;
+	viewDef->worldSpace.modelMatrix[2 * 4 + 2] = 1.0f;
+	viewDef->worldSpace.modelMatrix[3 * 4 + 3] = 1.0f;
+
+	viewDef->worldSpace.modelViewMatrix[0 * 4 + 0] = 1.0f;
+	viewDef->worldSpace.modelViewMatrix[1 * 4 + 1] = 1.0f;
+	viewDef->worldSpace.modelViewMatrix[2 * 4 + 2] = 1.0f;
+	viewDef->worldSpace.modelViewMatrix[3 * 4 + 3] = 1.0f;
+
+	viewDef->maxDrawSurfs = surfaces.Num();
+	viewDef->drawSurfs = (drawSurf_t**)R_FrameAlloc( viewDef->maxDrawSurfs * sizeof( viewDef->drawSurfs[0] ), FRAME_ALLOC_DRAW_SURFACE_POINTER );
+	viewDef->numDrawSurfs = 0;
+
+#if 1
+	// RB: give renderView the current time to calculate 2D shader effects
+	int shaderTime = tr.frameShaderTime * 1000; //Sys_Milliseconds();
+	viewDef->renderView.time[0] = shaderTime;
+	viewDef->renderView.time[1] = shaderTime;
+	// RB end
+#endif
+
+	viewDef_t* oldViewDef = tr.viewDef;
+	tr.viewDef = viewDef;
+
+	EmitSurfaces( viewDef->worldSpace.modelMatrix, viewDef->worldSpace.modelViewMatrix,
+				  false /* depthHack */, stereoEnabled /* stereoDepthSort */, false /* link as entity */ );
+
+	tr.viewDef = oldViewDef;
+
+	// add the command to draw this view
+	R_AddDrawViewCmd( viewDef, true );
+}
+// Admer end
+
 // RB begin
 /*
 ================
