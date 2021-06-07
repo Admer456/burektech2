@@ -1243,9 +1243,14 @@ void idMaterial::ParseFragmentMap( idLexer& src, newShaderStage_t* newStage )
 			cubeMap = CF_CAMERA;
 			continue;
 		}
-		if( !token.Icmp( "nearest" ) )
+		if ( !token.Icmp( "nearest" ) )
 		{
 			tf = TF_NEAREST;
+			continue;
+		}
+		if ( !token.Icmp( "nearestMipLinear" ) )
+		{
+			tf = TF_NEAREST_MIPMAP_LINEAR;
 			continue;
 		}
 		if( !token.Icmp( "linear" ) )
@@ -1573,6 +1578,11 @@ void idMaterial::ParseStage( idLexer& src, const textureRepeat_t trpDefault )
 		if( !token.Icmp( "nearest" ) )
 		{
 			tf = TF_NEAREST;
+			continue;
+		}
+		if ( !token.Icmp( "nearestMipLinear" ) )
+		{
+			tf = TF_NEAREST_MIPMAP_LINEAR;
 			continue;
 		}
 		if( !token.Icmp( "linear" ) )

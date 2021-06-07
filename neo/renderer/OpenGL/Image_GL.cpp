@@ -524,6 +524,10 @@ void idImage::SetTexParameters()
 			glTexParameterf( target, GL_TEXTURE_MIN_FILTER, GL_NEAREST );
 			glTexParameterf( target, GL_TEXTURE_MAG_FILTER, GL_NEAREST );
 			break;
+		case TF_NEAREST_MIPMAP_LINEAR:
+			glTexParameterf( target, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR );
+			glTexParameterf( target, GL_TEXTURE_MAG_FILTER, GL_NEAREST );
+			break;
 		default:
 			common->FatalError( "%s: bad texture filter %d", GetName(), filter );
 	}
@@ -531,7 +535,7 @@ void idImage::SetTexParameters()
 	if( glConfig.anisotropicFilterAvailable )
 	{
 		// only do aniso filtering on mip mapped images
-		if( filter == TF_DEFAULT )
+		if( filter == TF_DEFAULT || filter == TF_NEAREST_MIPMAP_LINEAR )
 		{
 			int aniso = r_maxAnisotropicFiltering.GetInteger();
 			if( aniso > glConfig.maxTextureAnisotropy )
