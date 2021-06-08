@@ -2038,6 +2038,20 @@ void idMaterial::ParseStage( idLexer& src, const textureRepeat_t trpDefault )
 
 /*
 ===============
+idMaterial::ParseStage
+===============
+*/
+void idMaterial::ParseStage( const char* stageString, const char* stageName, int lexerFlags, const textureRepeat_t trpDefault )
+{
+	idLexer lex;
+	lex.LoadMemory( stageString, strlen( stageString ), stageName );
+	lex.SetFlags( lexerFlags );
+	ParseStage( lex, trpDefault );
+	lex.FreeSource();
+}
+
+/*
+===============
 idMaterial::ParseDeform
 ===============
 */
@@ -2293,6 +2307,8 @@ void idMaterial::ParseMaterial( idLexer& src )
 	numStages = 0;
 	pd->registersAreConstant = true;			// until shown otherwise
 	textureRepeat_t	trpDefault = TR_REPEAT;		// allow a global setting for repeat
+
+	constexpr int lexerFlagsDefault = LEXFL_NOFATALERRORS | LEXFL_NOSTRINGCONCAT | LEXFL_NOSTRINGESCAPECHARS | LEXFL_ALLOWPATHNAMES;
 
 	while( 1 )
 	{
@@ -2561,33 +2577,21 @@ void idMaterial::ParseMaterial( idLexer& src )
 		else if( !token.Icmp( "diffusemap" ) || !token.Icmp( "basecolormap" ) )
 		{
 			str = R_ParsePastImageProgram( src );
-			idStr::snPrintf( buffer, sizeof( buffer ), "blend diffusemap\nmap %s\n}\n", str );
-			newSrc.LoadMemory( buffer, strlen( buffer ), "diffusemap" );
-			newSrc.SetFlags( LEXFL_NOFATALERRORS | LEXFL_NOSTRINGCONCAT | LEXFL_NOSTRINGESCAPECHARS | LEXFL_ALLOWPATHNAMES );
-			ParseStage( newSrc, trpDefault );
-			newSrc.FreeSource();
+			ParseStage( va( "blend diffusemap\nmap %s\n}\n", str ), "diffusemap", lexerFlagsDefault );
 			continue;
 		}
 		// specularmap for stage shortcut
 		else if( !token.Icmp( "specularmap" ) )
 		{
 			str = R_ParsePastImageProgram( src );
-			idStr::snPrintf( buffer, sizeof( buffer ), "blend specularmap\nmap %s\n}\n", str );
-			newSrc.LoadMemory( buffer, strlen( buffer ), "specularmap" );
-			newSrc.SetFlags( LEXFL_NOFATALERRORS | LEXFL_NOSTRINGCONCAT | LEXFL_NOSTRINGESCAPECHARS | LEXFL_ALLOWPATHNAMES );
-			ParseStage( newSrc, trpDefault );
-			newSrc.FreeSource();
+			ParseStage( va( "blend specularmap\nmap %s\n}\n", str ), "specularmap", lexerFlagsDefault );
 			continue;
 		}
 		// RB: rmaomap for stage shortcut
 		else if( !token.Icmp( "rmaomap" ) || !token.Icmp( "reflectionmap" )  || !token.Icmp( "pbrmap" ) )
 		{
 			str = R_ParsePastImageProgram( src );
-			idStr::snPrintf( buffer, sizeof( buffer ), "blend rmaomap\nmap %s\n}\n", str );
-			newSrc.LoadMemory( buffer, strlen( buffer ), "rmaomap" );
-			newSrc.SetFlags( LEXFL_NOFATALERRORS | LEXFL_NOSTRINGCONCAT | LEXFL_NOSTRINGESCAPECHARS | LEXFL_ALLOWPATHNAMES );
-			ParseStage( newSrc, trpDefault );
-			newSrc.FreeSource();
+			ParseStage( va( "blend rmaomap\nmap %s\n}\n", str ), "rmaomap", lexerFlagsDefault );
 			continue;
 		}
 		// Admer: pbrParams 1.0 0.5
@@ -2617,16 +2621,12 @@ void idMaterial::ParseMaterial( idLexer& src )
 			// Generate the RMAO texture based on pbrParams values
 			idStr::snPrintf( buffer, sizeof( buffer ), "map fromRGB_RMAO( %1.3f, %1.3f, 1.0 )", roughness, metallic );
 			newSrc.LoadMemory( buffer, strlen( buffer ), "pbrParams1" );
-			newSrc.SetFlags( LEXFL_NOFATALERRORS | LEXFL_NOSTRINGCONCAT | LEXFL_NOSTRINGESCAPECHARS | LEXFL_ALLOWPATHNAMES );
+			newSrc.SetFlags( lexerFlagsDefault );
 			str = R_ParsePastImageProgram( newSrc );
 			newSrc.FreeSource();
 
 			// Apply it
-			idStr::snPrintf( buffer, sizeof( buffer ), "blend rmaomap\nmap %s\n}\n", str );
-			newSrc.LoadMemory( buffer, strlen( buffer ), "pbrParams2" );
-			newSrc.SetFlags( LEXFL_NOFATALERRORS | LEXFL_NOSTRINGCONCAT | LEXFL_NOSTRINGESCAPECHARS | LEXFL_ALLOWPATHNAMES );
-			ParseStage( newSrc, trpDefault );
-			newSrc.FreeSource();
+			ParseStage( va( "blend rmaomap\nmap %s\n}\n", str ), "pbrParams2", lexerFlagsDefault );
 			continue;
 		}
 		// normalmap for stage shortcut
@@ -2635,7 +2635,7 @@ void idMaterial::ParseMaterial( idLexer& src )
 			str = R_ParsePastImageProgram( src );
 			idStr::snPrintf( buffer, sizeof( buffer ), "blend bumpmap\nmap %s\n}\n", str );
 			newSrc.LoadMemory( buffer, strlen( buffer ), "bumpmap" );
-			newSrc.SetFlags( LEXFL_NOFATALERRORS | LEXFL_NOSTRINGCONCAT | LEXFL_NOSTRINGESCAPECHARS | LEXFL_ALLOWPATHNAMES );
+			newSrc.SetFlags( lexerFlagsDefault );
 			ParseStage( newSrc, trpDefault );
 			newSrc.FreeSource();
 			continue;

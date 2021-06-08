@@ -882,6 +882,7 @@ private:
 	void				ParseVertexParm2( idLexer& src, newShaderStage_t* newStage );
 	void				ParseFragmentMap( idLexer& src, newShaderStage_t* newStage );
 	void				ParseStage( idLexer& src, const textureRepeat_t trpDefault = TR_REPEAT );
+	void				ParseStage( const char* stageString, const char* stageName, int lexerFlags, const textureRepeat_t trpDefault = TR_REPEAT ); // Admer: useful for shortcuts
 	void				ParseDeform( idLexer& src );
 	void				ParseDecalInfo( idLexer& src );
 	bool				CheckSurfaceParm( idToken* token );
