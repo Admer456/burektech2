@@ -8,6 +8,13 @@ I got a ton of work to do.
 * Game: simple breakable entity
 * Dmap: fix func_static inline collision
 
+## Game code
+
+* Weapons: nativisation
+* Weapons: tools from Odljev
+* AI: nativisation
+* AI: Recast navigation
+
 ## Rendering
 
 * Game: vegetation system
@@ -17,6 +24,7 @@ I got a ton of work to do.
 * ~~UI: render-to-texture GUIs, as an alternative to unprojected GUIs which only work on flat surfaces~~
 * UI: RmlUI integration to replace SWF
 * Game & Renderer: very easy-to-use rendermap entities (e.g. automatic func_monitor)
+* Game & Renderer: dome-based sky
 
 ## Asset authoring
 
