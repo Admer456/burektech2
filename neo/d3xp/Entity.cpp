@@ -1282,6 +1282,26 @@ void idEntity::SetModel( const char* modelname )
 		renderEntity.hModel->Reset();
 	}
 
+	renderEntity.autoGenShader = nullptr;
+
+	// Admer: Set up the autogen material
+	// This can be very expensive at load time, so autogen materials should be very short and have only one or two stages
+	if ( nullptr != renderEntity.hModel )
+	{
+		int numSurfaces = renderEntity.hModel->NumSurfaces();
+		for ( int i = 0; i < numSurfaces; i++ )
+		{
+			const modelSurface_t* surface = renderEntity.hModel->Surface( i );
+			materialAutoGen_t autoGen = surface->shader->GetAutoGenType();
+
+			if ( autoGen != MAG_NONE )
+			{
+				renderEntity.autoGenShader = surface->shader->CreateFromAutoGen( autoGen, entityNumber, name.c_str() );
+				break; // Currently, only one autogen material per model is supported
+			}
+		}
+	}
+
 	renderEntity.callback = NULL;
 	renderEntity.numJoints = 0;
 	renderEntity.joints = NULL;

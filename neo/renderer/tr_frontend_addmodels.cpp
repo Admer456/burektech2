@@ -641,6 +641,14 @@ void R_AddSingleModel( viewEntity_t* vEntity )
 			continue;
 		}
 
+		// Admer: instead of making a new model for every autogen material, let's just
+		// switch the current material to the autogen one as we encounter it
+		// Currently, we can render only one autogen material per model 
+		if ( shader->GetAutoGenType() != MAG_NONE )
+		{
+			shader = renderEntity->autoGenShader;
+		}
+
 		// motorsep 11-24-2014; checking for LOD surface for LOD1 iteration
 		if( shader->IsLOD() )
 		{

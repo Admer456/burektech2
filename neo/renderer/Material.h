@@ -301,8 +301,20 @@ typedef enum
 	MF_LOD3						= BIT( 9 ),	 // motorsep 11-24-2014; material flag for LOD3 iteration
 	MF_LOD4						= BIT( 10 ), // motorsep 11-24-2014; material flag for LOD4 iteration
 	MF_LOD_PERSISTENT			= BIT( 11 ), // motorsep 11-24-2014; material flag for persistent LOD iteration
-	MF_GUITARGET				= BIT( 12 )  // Admer: this GUI surface is used to compute a GUI render map, but a GUI should NOT be drawn on it
+	MF_GUITARGET				= BIT( 12 ), // Admer: this GUI surface is used to compute a GUI render map, but a GUI should NOT be drawn on it
+	MF_AUTOGEN_TEMPLATE			= BIT( 13 ), // Admer: this material is a template for auto-generated templates
 } materialFlags_t;
+
+// material auto-generation type
+// Right now, only guiRenderMap benefits from this
+// Whenever guiRenderMap is in a material, it creates a dynamic texture with the material's name + _dyn
+// So whenever we generate a *new* material based on that one, a new dynamic texture gets created too, which solves the problem
+// of curved GUI surfaces overriding each other. We can soon expand this to other rendermaps
+enum materialAutoGen_t
+{
+	MAG_NONE					= 0,
+	MAG_ENTITY_ID				= 1, // generate a new material with its original name + /ent + entity id (textures/auto => textures/auto/ent1)
+};
 
 // contents flags, NOTE: make sure to keep the defines in doom_defs.script up to date with these!
 typedef enum
@@ -424,6 +436,8 @@ public:
 	virtual bool		Parse( const char* text, const int textLength, bool allowBinaryVersion );
 	virtual void		FreeData();
 	virtual void		Print() const;
+
+	idMaterial*			CreateFromAutoGen( const materialAutoGen_t& autoGenType, const int& entityNumber, const char* entityName ) const;
 
 	//BSM Nerve: Added for material editor
 	bool				Save( const char* fileName = NULL );
@@ -694,6 +708,11 @@ public:
 		return static_cast<surfTypes_t>( surfaceFlags & SURF_TYPE_MASK );
 	}
 
+	const materialAutoGen_t GetAutoGenType() const
+	{
+		return autoGen;
+	}
+
 	// get material description
 	const char* 		GetDescription() const
 	{
@@ -906,6 +925,9 @@ private:
 private:
 	idStr				desc;				// description
 	idStr				renderBump;			// renderbump command options, without the "renderbump" at the start
+	
+	idStr				customFileName;		// Admer: autogen materials use the filename
+	int					customLineNum;		// and line number of their templates
 
 	idImage*			lightFalloffImage;	// only for light shaders
 
@@ -926,9 +948,9 @@ private:
 	int					contentFlags;		// content flags
 	int					surfaceFlags;		// surface flags
 	mutable int			materialFlags;		// material flags
+	materialAutoGen_t	autoGen;			// automatic generation
 
 	decalInfo_t			decalInfo;
-
 
 	mutable	float		sort;				// lower numbered shaders draw before higher numbered
 	int					stereoEye;

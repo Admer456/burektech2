@@ -88,6 +88,7 @@ void idMaterial::CommonInit()
 	contentFlags = CONTENTS_SOLID;
 	surfaceFlags = SURFTYPE_NONE;
 	materialFlags = 0;
+	//autoGen = MAG_NONE; // Admer: this causes a bug. autoGen should only be initialised from the constructor
 	sort = SS_BAD;
 	stereoEye = 0;
 	coverage = MC_BAD;
@@ -151,6 +152,9 @@ idMaterial::idMaterial()
 	// we put this here instead of in CommonInit, because
 	// we don't want it cleared when a material is purged
 	surfaceArea = 0;
+
+	customLineNum = -1;
+	autoGen = MAG_NONE;
 }
 
 /*
@@ -1424,6 +1428,12 @@ void idMaterial::ParseStage( idLexer& src, const textureRepeat_t trpDefault )
 			break;
 		}
 
+		// If this is an autogen template material, then skip all stages, they won't be used 
+		if ( TestMaterialFlag( MF_AUTOGEN_TEMPLATE ) )
+		{
+			continue;
+		}
+
 		//BSM Nerve: Added for stage naming in the material editor
 		if( !token.Icmp( "name" ) )
 		{
@@ -1938,7 +1948,6 @@ void idMaterial::ParseStage( idLexer& src, const textureRepeat_t trpDefault )
 			continue;
 		}
 
-
 		common->Warning( "unknown token '%s' in material '%s'", token.c_str(), GetName() );
 		SetMaterialFlag( MF_DEFAULTED );
 		return;
@@ -2346,8 +2355,6 @@ void idMaterial::ParseMaterial( idLexer& src )
 		{
 			continue;
 		}
-
-
 		// polygonOffset
 		else if( !token.Icmp( "polygonOffset" ) )
 		{
@@ -2658,7 +2665,6 @@ void idMaterial::ParseMaterial( idLexer& src )
 			SetMaterialFlag( MF_NOSHADOWS );
 			continue;
 		}
-
 		// motorsep 11-23-2014; material LOD keys that define what LOD iteration the surface falls into
 		else if( !token.Icmp( "lod1" ) )
 		{
@@ -2683,6 +2689,36 @@ void idMaterial::ParseMaterial( idLexer& src )
 		else if( !token.Icmp( "persistentLOD" ) )
 		{
 			SetMaterialFlag( MF_LOD_PERSISTENT );
+			continue;
+		}
+		// Admer: automatic material generation for game entities
+		else if ( !token.Icmp( "autoGen" ) )
+		{
+			if ( !src.ExpectAnyToken( &token ) )
+			{
+				common->Warning( "No autoGen parameter in material %s, ignoring...\n", GetName() );
+				continue;
+			}
+
+			// Auto-generated materials shouldn't generate any more of them
+			// Else we will run into infinite recursion
+			if ( autoGen == MAG_NONE )
+			{
+				if ( !idStr::Icmp( token, "entityId" ) )
+				{
+					autoGen = MAG_ENTITY_ID;
+				}
+				else
+				{
+					common->Warning( "Unknown autoGen parameter '%s' in material %s, ignoring...\n", token.c_str(), GetName() );
+				}
+
+				if ( autoGen != MAG_NONE )
+				{
+					SetMaterialFlag( MF_AUTOGEN_TEMPLATE );
+				}
+			}
+
 			continue;
 		}
 		else if( token == "{" )
@@ -2770,7 +2806,16 @@ bool idMaterial::Parse( const char* text, const int textLength, bool allowBinary
 	idToken	token;
 	mtrParsingData_t parsingData;
 
-	src.LoadMemory( text, textLength, GetFileName(), GetLineNum() );
+	const char* fileName = GetFileName();
+	int lineNum = GetLineNum();
+
+	if ( customLineNum != -1 )
+	{
+		fileName = customFileName.c_str();
+		lineNum = customLineNum;
+	}
+
+	src.LoadMemory( text, textLength, fileName, lineNum );
 	src.SetFlags( DECL_LEXER_FLAGS );
 	src.SkipUntilString( "{" );
 
@@ -3017,6 +3062,7 @@ bool idMaterial::Parse( const char* text, const int textLength, bool allowBinary
 		MakeDefault();
 		return false;
 	}
+
 	return true;
 }
 
@@ -3064,6 +3110,46 @@ void idMaterial::Print() const
 			common->Printf( "%i = %i %s %i\n", op->c, op->a, opNames[ op->opType ], op->b );
 		}
 	}
+}
+
+/*
+===============
+idMaterial::CreateFromAutoGen
+===============
+*/
+idMaterial* idMaterial::CreateFromAutoGen( const materialAutoGen_t& autoGenType, const int& entityNumber, const char* entityName ) const
+{
+	idMaterial* autoMaterial;
+	idStr newName = GetName();
+
+	switch ( autoGenType )
+	{
+	case MAG_ENTITY_ID: newName += idStr( "/ent" ) + entityNumber; break; // textures/mymaterial/ent20
+	default: return nullptr;
+	}
+
+	// Get the original text of this material
+	idTempArray<char> originalText( GetTextLength() );
+	GetText( originalText.Ptr() );
+
+	// Create a new material based on that, using this material as a template
+	autoMaterial = const_cast<idMaterial*>( declManager->FindMaterial( newName ) );
+
+	autoMaterial->autoGen = autoGenType;
+	autoMaterial->customFileName = GetFileName();
+	autoMaterial->customLineNum = GetLineNum();
+
+	// CreateFromAutoGen most usually gets called when entities are spawning
+	// or whenever they change their model, so we need to fool the material system into
+	// thinking we're still loading map images - that way our dynamic images will actually load
+	bool oldPreloadingMapImages = globalImages->preloadingMapImages;
+	globalImages->preloadingMapImages = true;
+
+	autoMaterial->Parse( originalText.Ptr(), GetTextLength(), false );
+	
+	globalImages->preloadingMapImages = oldPreloadingMapImages;
+
+	return autoMaterial;
 }
 
 /*

@@ -132,6 +132,7 @@ typedef struct renderEntity_s
 	// texturing
 	const idMaterial* 		customShader;			// if non-0, all surfaces will use this
 	const idMaterial* 		referenceShader;		// used so flares can reference the proper light shader
+	const idMaterial*		autoGenShader;			// Admer: for automatically-generated materials (e.g. per entity ID); used by security monitors and curved GUI surfs
 	const idDeclSkin* 		customSkin;				// 0 for no remappings
 	class idSoundEmitter* 	referenceSound;			// for shader sound tables, allowing effects to vary with sounds
 	float					shaderParms[ MAX_ENTITY_SHADER_PARMS ];	// can be used in any way by shader or model generation
