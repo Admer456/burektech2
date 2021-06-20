@@ -72,5 +72,5 @@ I got a ton of work to do.
 * PhysX or Bullet physics
 * C# scripting with .NET 5 or .NET 6
 * plugin system
-* HRT
+* HRTF
 * animation-driven ragdolls for more interesting character death animations
