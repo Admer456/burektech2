@@ -5965,7 +5965,7 @@ void idRenderBackend::MotionBlur()
 	{
 		const drawSurf_t* surf = drawSurfs[ surfNum ];
 
-		if( !surf->space->weaponDepthHack && !surf->space->skipMotionBlur && !surf->material->HasSubview() )
+		if( /*!surf->space->weaponDepthHack &&*/ !surf->space->skipMotionBlur && !surf->material->HasSubview() )
 		{
 			// Apply motion blur to this object
 			continue;

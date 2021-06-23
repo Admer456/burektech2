@@ -18,14 +18,22 @@ I got a ton of work to do.
 
 ## Rendering
 
-* Game: vegetation system
+* Game & Renderer: vegetation system
     * Basic vegetation instances
+        * Note: first get a basic clientside entity concept
+    * Batch rendering
+        * Idea: `idRenderBackend::DrawSingleInteraction` binds textures & shaders and essentially renders a surface, start looking there
+        * Idea: `idRenderBackend::DrawElementsWithCounters` does the actual draw call, either modify it or make a version of it that ultimately calls `glDrawElementsInstancedBaseVertex`
+        * Idea: `BatchRenderEntity` which contains a render entity reference and a list of transforms & other render data for each instance
+        * Note: shaders will have to be modified to support this
     * Interactive vegetation instances, that the player can 'squash'
-* Game: optional day/night cycle
+* Game & Renderer: optional day/night cycle
     * Different envprobe sets for day & night
     * Sun flares
     * Procedural sky
 * Materials & Renderer: ability to specify a custom interaction shader
+    * Idea: `idRenderBackend::DrawSingleInteraction` binds the interaction shader
+    * Note: there can be multiple interaction shaders, this may be tricky
 * Materials & Renderer: proper water
 * Materials & Renderer: terrain texture layers
 * ~~UI: render-to-texture GUIs, as an alternative to unprojected GUIs which only work on flat surfaces~~
