@@ -72,7 +72,7 @@ if (CMAKE_SYSTEM_PROCESSOR MATCHES "(x86)|(X86)|(amd64)|(AMD64)")
 	set(CPU_OPTIMIZATION "-mmmx -msse -msse2" CACHE STRING "Which CPU specific optimitations should be used beside the compiler's default?")
 endif()
 
-if(CMAKE_SYSTEM_PROCESSOR MATCHES "(x86)|(X86)|(amd64)|(AMD64)")
+if(CMAKE_SYSTEM_PROCESSOR MATCHES "(x86)|(X86)|(amd64)|(AMD64)|(e2k)|(E2K)")
 	option(USE_INTRINSICS_SSE "Compile using SSE intrinsics (e.g mmx, sse, msse2)" ON)
 else()
 	option(USE_INTRINSICS_SSE "Compile using SSE intrinsics (e.g mmx, sse, msse2)" OFF)
@@ -183,9 +183,9 @@ if(CMAKE_COMPILER_IS_GNUCC OR CMAKE_C_COMPILER_ID MATCHES "Clang")
 	# SRS - Make sure OSX can find system headers and add support for minimum OSX runtime version
 	if(${CMAKE_SYSTEM_NAME} MATCHES "Darwin")
 		# SRS - Also add -fasm-blocks otherwise Xcode complains
-		add_definitions(-fasm-blocks -isysroot "${CMAKE_OSX_SYSROOT}")
-		if("${CMAKE_OSX_DEPLOYMENT_TARGET}")
-			add_definitions(-mmacosx-version-min="${CMAKE_OSX_DEPLOYMENT_TARGET}")
+		add_definitions(-fasm-blocks)
+		if(CMAKE_OSX_DEPLOYMENT_TARGET)
+			add_definitions(-isysroot "${CMAKE_OSX_SYSROOT}" -mmacosx-version-min="${CMAKE_OSX_DEPLOYMENT_TARGET}")
 		endif()
 	endif()
 
@@ -1700,6 +1700,12 @@ else()
 		if(OPENAL)
 			find_package(OpenAL REQUIRED)
 			add_definitions(-DUSE_OPENAL)
+   
+            # SRS - Added support for OpenAL Soft headers on OSX (vs default macOS SDK headers)
+            if(${CMAKE_SYSTEM_NAME} MATCHES "Darwin" AND OPENAL_INCLUDE_DIR MATCHES "openal-soft")
+                include_directories(${OPENAL_INCLUDE_DIR})
+                add_definitions(-DUSE_OPENAL_SOFT_INCLUDES)
+            endif()
 
 			list(APPEND RBDOOM3_INCLUDES ${OPENAL_INCLUDES})
 			list(APPEND RBDOOM3_SOURCES
