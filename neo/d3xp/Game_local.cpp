@@ -4099,6 +4099,15 @@ void idGameLocal::SpawnMapEntities()
 		}
 	}
 
+	// Admer: entity post-spawning for entities that collect their ent pointers at spawn
+	for ( idEntity* ent : entities )
+	{
+		if ( nullptr != ent )
+		{
+			ent->PostSpawn();
+		}
+	}
+
 	Printf( "...%i entities spawned, %i inhibited\n\n", num, inhibit );
 }
 

@@ -245,6 +245,7 @@ public:
 	~idEntity();
 
 	void					Spawn();
+	virtual	void			PostSpawn() {} // called *after* all ents have spawned, for ents that set up their ent pointers at spawn
 
 	void					Save( idSaveGame* savefile ) const;
 	void					Restore( idRestoreGame* savefile );
