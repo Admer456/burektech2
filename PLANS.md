@@ -16,6 +16,17 @@ I got a ton of work to do.
 * AI: nativisation
 * AI: Recast navigation
 
+## Physics
+
+* AFs/ragdolls from model defs
+    * More concrete concept of a hitbox
+    * Auto-generate AF file from model def?
+* Animation-driven ragdolls
+    * Push bones towards the current animation pose (mode 1)
+    * Push bones based on the delta (current anim frame - last anim frame transform) (mode 2)
+    * Blending between mode 1 and mode 2
+    * Controlling mode 2's intensity (multiply the forces)
+
 ## Rendering
 
 * Game & Renderer: vegetation system
@@ -74,6 +85,10 @@ I got a ton of work to do.
 
 * Co-op
 * Clientside entities
+    * May only think in `idGameLocal::ClientRunFrame`
+    * May never modify server/game entities
+    * Are in a separate array than server/game entities
+    * Can be spawned from `idGameLocal::MapPopulate`, among other places
 
 ## Far far in the future, possible considerations
 
