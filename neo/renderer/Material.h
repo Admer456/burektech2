@@ -303,6 +303,7 @@ typedef enum
 	MF_LOD_PERSISTENT			= BIT( 11 ), // motorsep 11-24-2014; material flag for persistent LOD iteration
 	MF_GUITARGET				= BIT( 12 ), // Admer: this GUI surface is used to compute a GUI render map, but a GUI should NOT be drawn on it
 	MF_AUTOGEN_TEMPLATE			= BIT( 13 ), // Admer: this material is a template for auto-generated templates
+	MF_ORIGIN					= BIT( 14 ), // Admer: for origin brushes
 } materialFlags_t;
 
 // material auto-generation type
@@ -339,6 +340,7 @@ typedef enum
 	// contents used by utils
 	CONTENTS_AREAPORTAL			= BIT( 20 ),	// portal separating renderer areas
 	CONTENTS_NOCSG				= BIT( 21 ),	// don't cut this brush with CSG operations in the editor
+	CONTENTS_ORIGIN				= BIT( 22 ),
 
 	CONTENTS_REMOVE_UTIL		= ~( CONTENTS_AREAPORTAL | CONTENTS_NOCSG )
 } contentsFlags_t;
