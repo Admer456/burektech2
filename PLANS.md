@@ -1,4 +1,4 @@
-I got a ton of work to do.  
+I got a ton of work to do. Stuff that is ~~crossed out~~ means it's done.   
 
 ## Little things
 
@@ -7,7 +7,7 @@ I got a ton of work to do.
 * Game: `trigger_bind` map entity
 * Game: simple breakable entity
 * Dmap: fix `func_static` inline collision
-* Dmap: add back `origin` brushes from Quake
+* ~~Dmap: add back `origin` brushes from Quake~~
 
 ## Game code
 
