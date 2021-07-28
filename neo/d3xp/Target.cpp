@@ -2195,3 +2195,102 @@ void idTarget_Achievement::Event_Activate( idEntity* activator )
 		player->GetAchievementManager().EventCompletesAchievement( ( achievement_t )achievement );
 	}
 }
+
+/*
+===============================================================================
+
+idTarget_Bind
+
+===============================================================================
+*/
+
+CLASS_DECLARATION( idTarget, idTarget_Bind )
+EVENT( EV_Activate, idTarget_Bind::Event_Activate )
+END_CLASS
+
+/*
+================
+idTarget_Achievement::PostSpawn
+================
+*/
+void idTarget_Bind::PostSpawn()
+{
+	bool okay = true;
+
+	const char* parentName = spawnArgs.GetString( "parent" );
+	const char* childName = spawnArgs.GetString( "child" );
+	bool startOn = spawnArgs.GetBool( "startOn", true );
+
+	parentEntity = gameLocal.FindEntity( parentName );
+	childEntity = gameLocal.FindEntity( childName );
+
+	okay = IsOkay();
+
+	if ( !okay )
+	{
+		Hide(); // how do we delete entities?
+		return;
+	}
+
+	if ( startOn )
+	{
+		PostEventMS( &EV_Activate, 20 );
+	}
+}
+
+/*
+================
+idTarget_Achievement::IsOkay
+================
+*/
+bool idTarget_Bind::IsOkay() const
+{
+	if ( nullptr == parentEntity )
+	{
+		const char* parentName = spawnArgs.GetString( "parent" );
+		gameLocal.DWarning( "idTarget_Bind cannot find parent entity '%s'\n", parentName );
+		return false;
+	}
+
+	if ( nullptr == childEntity )
+	{
+		const char* childName = spawnArgs.GetString( "child" );
+		gameLocal.DWarning( "idTarget_Bind cannot find child entity '%s'\n", childName );
+		return false;
+	}
+	else
+	{	// It'd be rather impolite to take a child away from its parent
+		if ( childEntity->IsBound() && !childEntity->IsBoundTo( parentEntity ) )
+		{
+			gameLocal.DWarning( "Entity '%s' already has a parent\n", childEntity->GetName() );
+			return false;
+		}
+	}
+
+	return true;
+}
+
+/*
+================
+idTarget_Achievement::Event_Activate
+================
+*/
+void idTarget_Bind::Event_Activate( idEntity* activator )
+{
+	if ( !IsOkay() )
+	{
+		gameLocal.DWarning( "This could've been a naughty crash\n" );
+		return;
+	}
+
+	// Now that we're 100% sure that childEntity and parentEntity are valid,
+	// let's try binding or unbinding them
+	if ( childEntity->IsBound() )
+	{
+		childEntity->Unbind();
+	}
+	else
+	{
+		childEntity->Bind( parentEntity, spawnArgs.GetBool( "oriented", true ) );
+	}
+}

@@ -648,4 +648,27 @@ private:
 	void				Event_Activate( idEntity* activator );
 };
 
+/*
+===============================================================================
+
+idTarget_Bind
+
+	An entity that binds two entities together
+===============================================================================
+*/
+class idTarget_Bind : public idTarget
+{
+public:
+	CLASS_PROTOTYPE( idTarget_Bind );
+
+	void				PostSpawn() override;
+
+private:
+	idEntity*			parentEntity{ nullptr };
+	idEntity*			childEntity{ nullptr };
+private:
+	bool				IsOkay() const;
+	void				Event_Activate( idEntity* activator );
+};
+
 #endif /* !__GAME_TARGET_H__ */
