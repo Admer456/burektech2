@@ -8504,6 +8504,8 @@ than the client.
 */
 int idPlayer::GetPhysicsTimeStep() const
 {
+	extern idCVar g_timeScale;
+
 	// if the ucDeltaMillisecond value looks wrong, use the game delta milliseconds
 	// This can happen if the user brings up the pause menu in SP
 	const int ucDeltaMilliseconds = usercmd.clientGameMilliseconds - oldCmd.clientGameMilliseconds;
@@ -8513,7 +8515,7 @@ int idPlayer::GetPhysicsTimeStep() const
 	}
 	else
 	{
-		return ucDeltaMilliseconds;
+		return ucDeltaMilliseconds * g_timeScale.GetFloat();
 	}
 }
 

@@ -498,7 +498,7 @@ idEntity::idEntity():
 
 	memset( &xrayEntity, 0, sizeof( xrayEntity ) );
 
-	timeGroup = TIME_GROUP1;
+	timeGroup = TIME_GROUP2;
 	xrayEntityHandle = -1;
 	xraySkin = NULL;
 
@@ -677,7 +677,7 @@ void idEntity::Spawn()
 	}
 
 	// determine time group
-	DetermineTimeGroup( spawnArgs.GetBool( "slowmo", "1" ) );
+	DetermineTimeGroup( spawnArgs.GetBool( "slowmo", "0" ) );
 }
 
 /*

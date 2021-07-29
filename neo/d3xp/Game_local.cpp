@@ -72,7 +72,7 @@ const char* idGameLocal::sufaceTypeNames[ MAX_SURFACE_TYPES ] =
 };
 
 idCVar net_usercmd_timing_debug( "net_usercmd_timing_debug", "0", CVAR_BOOL, "Print messages about usercmd timing." );
-
+idCVar g_timeScale( "g_timeScale", "1", CVAR_FLOAT | CVAR_GAME | CVAR_NETWORKSYNC, "Alters the game's perception of time.", 0.05f, 4.0f );
 
 // List of all defs used by the player that will stay on the fast timeline
 static const char* fastEntityList[] =
@@ -2670,12 +2670,26 @@ void idGameLocal::RunFrame( idUserCmdMgr& cmdMgr, gameReturn_t& ret )
 		{
 			// update the game time
 			framenum++;
-			fast.previousTime = FRAME_TO_MSEC( framenum - 1 );
-			fast.time = FRAME_TO_MSEC( framenum );
+
+			// Admer: this is legacy time logic, and while it's cool and all,
+			// I really needed to do this in some other way
+			//fast.previousTime = FRAME_TO_MSEC( framenum - 1 );
+			//fast.time = FRAME_TO_MSEC( framenum );
+			//fast.realClientTime = fast.time;
+
+			fast.previousTime = fast.time;
+			fast.time = fast.previousTime + FRAME_TO_MSEC( 1 ) * g_timeScale.GetFloat();
+			// This can happen if the time scale is too small
+			if ( fast.previousTime >= fast.time )
+			{
+				fast.time = fast.previousTime + 1;
+			}
+			
 			fast.realClientTime = fast.time;
 			SetServerGameTimeMs( fast.time );
 
-			ComputeSlowScale();
+			//ComputeSlowScale();
+			gameSoundWorld->SetSlowmoSpeed( g_timeScale.GetFloat() );
 
 			slow.previousTime = slow.time;
 			slow.time += idMath::Ftoi( ( fast.time - fast.previousTime ) * slowmoScale );
@@ -5531,16 +5545,17 @@ idGameLocal::SelectTimeGroup
 */
 void idGameLocal::SelectTimeGroup( int timeGroup )
 {
-	if( timeGroup )
-	{
-		fast.Get( time, previousTime, realClientTime );
-	}
-	else
-	{
+	//if( timeGroup )
+	//{
+	//	fast.Get( time, previousTime, realClientTime );
+	//}
+	//else
+	//{
 		slow.Get( time, previousTime, realClientTime );
-	}
+	//}
 
-	selectedGroup = timeGroup;
+	//selectedGroup = timeGroup;
+	selectedGroup = 0;
 }
 
 /*
