@@ -2199,21 +2199,21 @@ void idTarget_Achievement::Event_Activate( idEntity* activator )
 /*
 ===============================================================================
 
-idTarget_Bind
+admTarget_Bind
 
 ===============================================================================
 */
 
-CLASS_DECLARATION( idTarget, idTarget_Bind )
-EVENT( EV_Activate, idTarget_Bind::Event_Activate )
+CLASS_DECLARATION( idTarget, admTarget_Bind )
+EVENT( EV_Activate, admTarget_Bind::Event_Activate )
 END_CLASS
 
 /*
 ================
-idTarget_Achievement::PostSpawn
+admTarget_Bind::PostSpawn
 ================
 */
-void idTarget_Bind::PostSpawn()
+void admTarget_Bind::PostSpawn()
 {
 	bool okay = true;
 
@@ -2221,50 +2221,87 @@ void idTarget_Bind::PostSpawn()
 	const char* childName = spawnArgs.GetString( "child" );
 	bool startOn = spawnArgs.GetBool( "startOn", true );
 
-	parentEntity = gameLocal.FindEntity( parentName );
-	childEntity = gameLocal.FindEntity( childName );
+	if ( idStr::Icmp( parentName, "!activator" ) )
+	{
+		parentEntity = gameLocal.FindEntity( parentName );
+	}
+	else
+	{
+		parentIsActivator = true;
+	}
+
+	if ( idStr::Icmp( childName, "!activator" ) )
+	{
+		childEntity = gameLocal.FindEntity( childName );
+	}
+	else
+	{
+		childIsActivator = true;
+	}
 
 	okay = IsOkay();
 
 	if ( !okay )
 	{
-		Hide(); // how do we delete entities?
+		PostEventMS( &EV_SafeRemove, 10 );
 		return;
 	}
 
 	if ( startOn )
 	{
-		PostEventMS( &EV_Activate, 20 );
+		PostEventMS( &EV_Activate, 0 );
 	}
 }
 
 /*
 ================
-idTarget_Achievement::IsOkay
+admTarget_Bind::IsOkay
+
+Rules:
+- the parent can have multiple children
+- the child cannot be parented to an entity that isn't parentEntity
+- both cannot be nullptr
+- one of them can be nullptr IF xIsActivator is true
+- both cannot be the activator, because they violate the rule below:
+- parent and child mustn't be the same entity
 ================
 */
-bool idTarget_Bind::IsOkay() const
+bool admTarget_Bind::IsOkay() const
 {
-	if ( nullptr == parentEntity )
+	if ( nullptr == parentEntity && !parentIsActivator )
 	{
 		const char* parentName = spawnArgs.GetString( "parent" );
-		gameLocal.DWarning( "idTarget_Bind cannot find parent entity '%s'\n", parentName );
+		gameLocal.DWarning( "%s: idTarget_Bind cannot find parent entity '%s'\n", GetName(), parentName );
 		return false;
 	}
 
-	if ( nullptr == childEntity )
+	if ( nullptr == childEntity && !childIsActivator )
 	{
 		const char* childName = spawnArgs.GetString( "child" );
-		gameLocal.DWarning( "idTarget_Bind cannot find child entity '%s'\n", childName );
+		gameLocal.DWarning( "%s: idTarget_Bind cannot find child entity '%s'\n", GetName(), childName );
 		return false;
 	}
-	else
+
+	else if ( !childIsActivator )
 	{	// It'd be rather impolite to take a child away from its parent
 		if ( childEntity->IsBound() && !childEntity->IsBoundTo( parentEntity ) )
 		{
-			gameLocal.DWarning( "Entity '%s' already has a parent\n", childEntity->GetName() );
+			gameLocal.DWarning( "%s: Entity '%s' already has a parent\n", GetName(), childEntity->GetName() );
 			return false;
 		}
+	}
+
+	if ( parentEntity == childEntity )
+	{
+		if ( nullptr != childEntity )
+		{
+			gameLocal.DWarning( "%s: Cannot parent '%s' to itself\n", GetName(), childEntity->GetName() );
+		}
+	}
+
+	if ( childIsActivator == parentIsActivator )
+	{
+		gameLocal.DWarning( "%s: Cannot parent activator to itself\n", GetName() );
 	}
 
 	return true;
@@ -2272,15 +2309,25 @@ bool idTarget_Bind::IsOkay() const
 
 /*
 ================
-idTarget_Achievement::Event_Activate
+admTarget_Bind::Event_Activate
 ================
 */
-void idTarget_Bind::Event_Activate( idEntity* activator )
+void admTarget_Bind::Event_Activate( idEntity* activator )
 {
 	if ( !IsOkay() )
 	{
 		gameLocal.DWarning( "This could've been a naughty crash\n" );
 		return;
+	}
+
+	if ( parentIsActivator )
+	{
+		parentEntity = activator;
+	}
+
+	if ( childIsActivator )
+	{
+		childEntity = activator;
 	}
 
 	// Now that we're 100% sure that childEntity and parentEntity are valid,
@@ -2292,5 +2339,11 @@ void idTarget_Bind::Event_Activate( idEntity* activator )
 	else
 	{
 		childEntity->Bind( parentEntity, spawnArgs.GetBool( "oriented", true ) );
+	}
+
+	// Remove if the mapper set it to only once
+	if ( spawnArgs.GetBool( "onlyOnce" ) )
+	{
+		PostEventMS( &EV_SafeRemove, 0 );
 	}
 }

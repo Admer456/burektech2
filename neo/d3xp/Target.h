@@ -656,16 +656,20 @@ idTarget_Bind
 	An entity that binds two entities together
 ===============================================================================
 */
-class idTarget_Bind : public idTarget
+class admTarget_Bind : public idTarget
 {
 public:
-	CLASS_PROTOTYPE( idTarget_Bind );
+	CLASS_PROTOTYPE( admTarget_Bind );
 
 	void				PostSpawn() override;
 
 private:
 	idEntity*			parentEntity{ nullptr };
 	idEntity*			childEntity{ nullptr };
+
+	bool				parentIsActivator{ false };
+	bool				childIsActivator{ false };
+
 private:
 	bool				IsOkay() const;
 	void				Event_Activate( idEntity* activator );
