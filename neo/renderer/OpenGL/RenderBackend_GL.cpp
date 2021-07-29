@@ -705,6 +705,10 @@ void idRenderBackend::DrawElementsWithCounters( const drawSurf_t* surf )
 		glEnableVertexAttribArray( PC_ATTRIB_INDEX_COLOR2 );
 		glEnableVertexAttribArray( PC_ATTRIB_INDEX_ST );
 		glEnableVertexAttribArray( PC_ATTRIB_INDEX_TANGENT );
+		/*
+		glEnableVertexAttribArray( PC_ATTRIB_INSTANCE_POSITION );
+		glEnableVertexAttribArray( PC_ATTRIB_INSTANCE_AXIS );
+		*/
 
 		glVertexAttribPointer( PC_ATTRIB_INDEX_VERTEX, 3, GL_FLOAT, GL_FALSE, sizeof( idDrawVert ), ( void* )( DRAWVERT_XYZ_OFFSET ) );
 		glVertexAttribPointer( PC_ATTRIB_INDEX_NORMAL, 4, GL_UNSIGNED_BYTE, GL_TRUE, sizeof( idDrawVert ), ( void* )( DRAWVERT_NORMAL_OFFSET ) );
@@ -712,6 +716,10 @@ void idRenderBackend::DrawElementsWithCounters( const drawSurf_t* surf )
 		glVertexAttribPointer( PC_ATTRIB_INDEX_COLOR2, 4, GL_UNSIGNED_BYTE, GL_TRUE, sizeof( idDrawVert ), ( void* )( DRAWVERT_COLOR2_OFFSET ) );
 		glVertexAttribPointer( PC_ATTRIB_INDEX_ST, 2, GL_HALF_FLOAT, GL_TRUE, sizeof( idDrawVert ), ( void* )( DRAWVERT_ST_OFFSET ) );
 		glVertexAttribPointer( PC_ATTRIB_INDEX_TANGENT, 4, GL_UNSIGNED_BYTE, GL_TRUE, sizeof( idDrawVert ), ( void* )( DRAWVERT_TANGENT_OFFSET ) );
+		/*
+		glVertexAttribPointer( PC_ATTRIB_INSTANCE_POSITION, 3, GL_FLOAT, GL_FALSE, sizeof( idDrawVert ) + something, (void*)(DRAWINSTANCE_POSITION_OFFSET));
+		glVertexAttribPointer( PC_ATTRIB_INSTANCE_AXIS, 9, GL_FLOAT, GL_FALSE, sizeof( idDrawVert ) + something, (void*)(DRAWINSTANCE_AXIS_OFFSET));
+		*/
 
 		vertexLayout = LAYOUT_DRAW_VERT;
 	}
@@ -723,6 +731,17 @@ void idRenderBackend::DrawElementsWithCounters( const drawSurf_t* surf )
 							  ( triIndex_t* )indexOffset,
 							  vertOffset / sizeof( idDrawVert ) );
 
+	// Admer: this is how instanced would probably look
+	// We would also need to set up a glVertexAttribPointer to store our transform data, a couple of lines above
+	/*
+	glDrawElementsInstancedBaseVertex( GL_TRIANGLES,
+									   r_singleTriangle.GetBool() ? 3 : surf->numIndexes,
+									   GL_INDEX_TYPE,
+									   (triIndex_t*)indexOffset,
+									   numInstances,
+									   vertOffset / sizeof( idDrawVert ) );
+	*/
+	
 	// RB: added stats
 	pc.c_drawElements++;
 	pc.c_drawIndexes += surf->numIndexes;
