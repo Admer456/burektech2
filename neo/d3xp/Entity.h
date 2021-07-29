@@ -264,14 +264,23 @@ public:
 	virtual renderView_t* 	GetRenderView();
 
 	// thinking
+
+	// Thinking alone is typically serverside logic, but can be called from ClientThink in some entity classes in cases where applicable (e.g. projectiles)
 	virtual void			Think();
-	bool					CheckDormant();	// dormant == on the active list, but out of PVS
-	virtual	void			DormantBegin();	// called when entity becomes dormant
-	virtual	void			DormantEnd();		// called when entity wakes from being dormant
+	// Dormant == on the active list, but out of PVS
+	bool					CheckDormant();
+	// Called when entity becomes dormant
+	virtual	void			DormantBegin();
+	// Called when entity wakes from being dormant
+	virtual	void			DormantEnd();		
 	bool					IsActive() const;
+	// Sets a TH_ flag
 	void					BecomeActive( int flags );
+	// Clears a TH_ flag
 	void					BecomeInactive( int flags );
 	void					UpdatePVSAreas( const idVec3& pos );
+	// Lets the entity synchronise its properties across the network,
+	// enables WriteToSnapshot and ReadFromSnapshot
 	void					BecomeReplicated();
 
 	// visuals
@@ -304,6 +313,8 @@ public:
 	// animation
 	virtual bool			UpdateAnimationControllers();
 	bool					UpdateRenderEntity( renderEntity_t* renderEntity, const renderView_t* renderView );
+	// This is a special one. The render system calls this in order to make any necessary modifications to the render entity
+	// MUST NOT change the game state
 	static bool				ModelCallback( renderEntity_t* renderEntity, const renderView_t* renderView );
 	virtual idAnimator* 	GetAnimator();	// returns animator object used by this entity
 
@@ -439,12 +450,19 @@ public:
 	// Called on clients in an MP game, does the actual interpolation for the entity.
 	// This function will eventually replace ClientPredictionThink completely.
 	virtual void			ClientThink( const int curTime, const float fraction, const bool predict );
-
+	// Deprecated
 	virtual void			ClientPredictionThink();
+	// Write data to a network snapshot of this entity for the purposes of network replication; each entity class can do its own
 	virtual void			WriteToSnapshot( idBitMsg& msg ) const;
+	// Internal version of ReadFromSnapshot, none of your concern
 	void					ReadFromSnapshot_Ex( const idBitMsg& msg );
+	// Read data from a network snapshot of this entity for the purposes of network replication; each entity class can do its own
 	virtual void			ReadFromSnapshot( const idBitMsg& msg );
+
+	// Receives an event on the serverside, may affect game state
+	// Is meant to be overridden by subclasses
 	virtual bool			ServerReceiveEvent( int event, int time, const idBitMsg& msg );
+	// Receives an event on the clientside, shouldn't affect game state
 	virtual bool			ClientReceiveEvent( int event, int time, const idBitMsg& msg );
 
 	void					WriteBindToSnapshot( idBitMsg& msg ) const;
@@ -454,7 +472,14 @@ public:
 	void					WriteGUIToSnapshot( idBitMsg& msg ) const;
 	void					ReadGUIFromSnapshot( const idBitMsg& msg );
 
+	// Sends an event to all clients
+	// @param eventId: a number from idEntity::EVENT_ or own class's EVENT_ enum entries, which is accordingly parsed in ServerReceiveEvent/ClientReceiveEvent
+	// @param msg: data, can be nullptr if the event doesn't send any data
+	// @param saveEvent: save the event for clients who join late
 	void					ServerSendEvent( int eventId, const idBitMsg* msg, bool saveEvent, lobbyUserID_t excluding = lobbyUserID_t() ) const;
+	// Sends an event to the host/server
+	// @param eventId: a number from idEntity::EVENT_ or own class's EVENT_ enum entries, which is accordingly parsed in ServerReceiveEvent/ClientReceiveEvent
+	// @param msg: data, can be nullptr if the event doesn't send any data
 	void					ClientSendEvent( int eventId, const idBitMsg* msg ) const;
 
 	void					SetUseClientInterpolation( bool use )
