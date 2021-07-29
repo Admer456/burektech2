@@ -78,7 +78,6 @@ public:
 	virtual void			WriteToSnapshot( idBitMsg& msg ) const;
 	virtual void			ReadFromSnapshot( const idBitMsg& msg );
 	virtual void			ClientThink( const int curTime, const float fraction, const bool predict );
-	virtual void			ClientPredictionThink();
 
 	static idEntityFx* 		StartFx( const char* fx, const idVec3* useOrigin, const idMat3* useAxis, idEntity* ent, bool bind );
 

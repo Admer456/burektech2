@@ -796,16 +796,6 @@ void EnvironmentProbe::Event_FadeIn( float time )
 
 /*
 ================
-EnvironmentProbe::ClientPredictionThink
-================
-*/
-void EnvironmentProbe::ClientPredictionThink()
-{
-	Think();
-}
-
-/*
-================
 EnvironmentProbe::WriteToSnapshot
 ================
 */

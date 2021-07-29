@@ -1500,22 +1500,6 @@ void idBrittleFracture::ClientThink( const int curTime, const float fraction, co
 
 /*
 ================
-idBrittleFracture::ClientPredictionThink
-================
-*/
-void idBrittleFracture::ClientPredictionThink()
-{
-	// only think forward because the state is not synced through snapshots
-	if( !gameLocal.isNewFrame )
-	{
-		return;
-	}
-
-	Think();
-}
-
-/*
-================
 idBrittleFracture::ClientReceiveEvent
 ================
 */

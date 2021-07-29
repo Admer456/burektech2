@@ -448,10 +448,7 @@ public:
 	};
 
 	// Called on clients in an MP game, does the actual interpolation for the entity.
-	// This function will eventually replace ClientPredictionThink completely.
 	virtual void			ClientThink( const int curTime, const float fraction, const bool predict );
-	// Deprecated
-	virtual void			ClientPredictionThink();
 	// Write data to a network snapshot of this entity for the purposes of network replication; each entity class can do its own
 	virtual void			WriteToSnapshot( idBitMsg& msg ) const;
 	// Internal version of ReadFromSnapshot, none of your concern
@@ -716,7 +713,6 @@ public:
 	void					Save( idSaveGame* savefile ) const;
 	void					Restore( idRestoreGame* savefile );
 
-	virtual void			ClientPredictionThink();
 	virtual void			ClientThink( const int curTime, const float fraction, const bool predict );
 	virtual void			Think();
 

@@ -134,7 +134,6 @@ public:
 		EVENT_MAXEVENTS
 	};
 
-	virtual void	ClientPredictionThink();
 	virtual void	WriteToSnapshot( idBitMsg& msg ) const;
 	virtual void	ReadFromSnapshot( const idBitMsg& msg );
 	virtual bool	ClientReceiveEvent( int event, int time, const idBitMsg& msg );

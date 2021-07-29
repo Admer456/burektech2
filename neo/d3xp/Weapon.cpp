@@ -4762,17 +4762,6 @@ void idWeapon::ClientThink( const int curTime, const float fraction, const bool 
 	UpdateAnimation();
 }
 
-/*
-===============
-idWeapon::ClientPredictionThink
-===============
-*/
-void idWeapon::ClientPredictionThink()
-{
-	UpdateAnimation();
-}
-
-
 void idWeapon::ForceAmmoInClip()
 {
 	ammoClip = clipSize;

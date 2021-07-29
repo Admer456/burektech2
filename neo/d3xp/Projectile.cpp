@@ -1560,20 +1560,6 @@ void idProjectile::ClientThink( const int curTime, const float fraction, const b
 
 /*
 ================
-idProjectile::ClientPredictionThink
-================
-*/
-void idProjectile::ClientPredictionThink()
-{
-	if( !renderEntity.hModel )
-	{
-		return;
-	}
-	Think();
-}
-
-/*
-================
 idProjectile::WriteToSnapshot
 ================
 */

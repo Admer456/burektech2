@@ -205,7 +205,6 @@ public:
 	};
 	virtual bool			ClientReceiveEvent( int event, int time, const idBitMsg& msg );
 
-	virtual void			ClientPredictionThink();
 	virtual void			ClientThink( const int curTime, const float fraction, const bool predict );
 	void					MuzzleFlashLight();
 	void					RemoveMuzzleFlashlight();

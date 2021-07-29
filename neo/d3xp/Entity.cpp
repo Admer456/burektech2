@@ -5717,17 +5717,6 @@ void idEntity::ClientThink( const int curTime, const float fraction, const bool 
 
 /*
 ================
-idEntity::ClientPredictionThink
-================
-*/
-void idEntity::ClientPredictionThink()
-{
-	RunPhysics();
-	Present();
-}
-
-/*
-================
 idEntity::WriteBindToSnapshot
 ================
 */
@@ -6262,18 +6251,6 @@ void idAnimatedEntity::Restore( idRestoreGame* savefile )
 			gameRenderWorld->UpdateEntityDef( modelDefHandle, &renderEntity );
 		}
 	}
-}
-
-/*
-================
-idAnimatedEntity::ClientPredictionThink
-================
-*/
-void idAnimatedEntity::ClientPredictionThink()
-{
-	RunPhysics();
-	UpdateAnimation();
-	Present();
 }
 
 /*

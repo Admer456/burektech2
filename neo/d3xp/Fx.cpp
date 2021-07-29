@@ -940,21 +940,6 @@ void idEntityFx::ClientThink( const int curTime, const float fraction, const boo
 }
 
 /*
-=================
-idEntityFx::ClientPredictionThink
-=================
-*/
-void idEntityFx::ClientPredictionThink()
-{
-	if( gameLocal.isNewFrame )
-	{
-		Run( gameLocal.time );
-	}
-	RunPhysics();
-	Present();
-}
-
-/*
 ===============================================================================
 
   idTeleporter

@@ -507,22 +507,6 @@ void idItem::ClientThink( const int curTime, const float fraction, const bool pr
 	Think();
 }
 
-
-/*
-================
-idItem::ClientPredictionThink
-================
-*/
-void idItem::ClientPredictionThink()
-{
-	// only think forward because the state is not synced through snapshots
-	if( !gameLocal.isNewFrame )
-	{
-		return;
-	}
-	Think();
-}
-
 /*
 ================
 idItem::WriteFromSnapshot

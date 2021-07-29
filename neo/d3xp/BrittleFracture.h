@@ -85,7 +85,6 @@ public:
 	};
 
 	virtual void				ClientThink( const int curTime, const float fraction, const bool predict );
-	virtual void				ClientPredictionThink();
 	virtual bool				ClientReceiveEvent( int event, int time, const idBitMsg& msg );
 
 private:

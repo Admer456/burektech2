@@ -1332,16 +1332,6 @@ void idLight::Event_FadeIn( float time )
 
 /*
 ================
-idLight::ClientPredictionThink
-================
-*/
-void idLight::ClientPredictionThink()
-{
-	Think();
-}
-
-/*
-================
 idLight::WriteToSnapshot
 ================
 */
