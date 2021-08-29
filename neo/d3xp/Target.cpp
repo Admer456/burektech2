@@ -2215,12 +2215,11 @@ admTarget_Bind::PostSpawn
 */
 void admTarget_Bind::PostSpawn()
 {
-	bool okay = true;
-
 	const char* parentName = spawnArgs.GetString( "parent" );
 	const char* childName = spawnArgs.GetString( "child" );
 	bool startOn = spawnArgs.GetBool( "startOn", true );
 
+	// TODO: Add !activator, !caller, !player etc. support to gameLocal.FindEntity
 	if ( idStr::Icmp( parentName, "!activator" ) )
 	{
 		parentEntity = gameLocal.FindEntity( parentName );
@@ -2239,11 +2238,9 @@ void admTarget_Bind::PostSpawn()
 		childIsActivator = true;
 	}
 
-	okay = IsOkay();
-
-	if ( !okay )
+	if ( !IsOkay() )
 	{
-		PostEventMS( &EV_SafeRemove, 10 );
+		PostEventMS( &EV_SafeRemove, 0 );
 		return;
 	}
 
@@ -2296,12 +2293,14 @@ bool admTarget_Bind::IsOkay() const
 		if ( nullptr != childEntity )
 		{
 			gameLocal.DWarning( "%s: Cannot parent '%s' to itself\n", GetName(), childEntity->GetName() );
+			return false;
 		}
 	}
 
 	if ( childIsActivator == parentIsActivator )
 	{
 		gameLocal.DWarning( "%s: Cannot parent activator to itself\n", GetName() );
+		return false;
 	}
 
 	return true;
