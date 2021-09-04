@@ -265,7 +265,8 @@ public:
 
 	// thinking
 
-	// Thinking alone is typically serverside logic, but can be called from ClientThink in some entity classes in cases where applicable (e.g. projectiles)
+	// Thinking alone is typically serverside logic, but can be called from 
+	// ClientThink in some entity classes in cases where applicable (e.g. projectiles)
 	virtual void			Think();
 	// Dormant == on the active list, but out of PVS
 	bool					CheckDormant();

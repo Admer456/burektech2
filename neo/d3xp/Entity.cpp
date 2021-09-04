@@ -689,7 +689,7 @@ idEntity::~idEntity()
 	DeconstructScriptObject();
 	scriptObject.Free();
 
-	if( thinkFlags )
+	if ( thinkFlags )
 	{
 		BecomeInactive( thinkFlags );
 	}
@@ -719,7 +719,7 @@ idEntity::~idEntity()
 	FreeModelDef();
 	FreeSoundEmitter( false );
 
-	if( xrayEntityHandle != -1 )
+	if ( xrayEntityHandle != -1 )
 	{
 		gameRenderWorld->FreeEntityDef( xrayEntityHandle );
 		xrayEntityHandle = -1;

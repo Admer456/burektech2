@@ -330,12 +330,13 @@ typedef enum
 	CONTENTS_BLOOD				= BIT( 7 ),	// used to detect blood decals
 	CONTENTS_BODY				= BIT( 8 ),	// used for actors
 	CONTENTS_PROJECTILE			= BIT( 9 ),	// used for projectiles
-	CONTENTS_CORPSE				= BIT( 10 ),	// used for dead bodies
-	CONTENTS_RENDERMODEL		= BIT( 11 ),	// used for render models for collision detection
-	CONTENTS_TRIGGER			= BIT( 12 ),	// used for triggers
-	CONTENTS_AAS_SOLID			= BIT( 13 ),	// solid for AAS
-	CONTENTS_AAS_OBSTACLE		= BIT( 14 ),	// used to compile an obstacle into AAS that can be enabled/disabled
-	CONTENTS_FLASHLIGHT_TRIGGER	= BIT( 15 ),	// used for triggers that are activated by the flashlight
+	CONTENTS_CORPSE				= BIT( 10 ),// used for dead bodies
+	CONTENTS_RENDERMODEL		= BIT( 11 ),// used for render models for collision detection
+	CONTENTS_TRIGGER			= BIT( 12 ),// used for triggers
+	CONTENTS_AAS_SOLID			= BIT( 13 ),// solid for AAS
+	CONTENTS_AAS_OBSTACLE		= BIT( 14 ),// used to compile an obstacle into AAS that can be enabled/disabled
+	CONTENTS_FLASHLIGHT_TRIGGER	= BIT( 15 ),// used for triggers that are activated by the flashlight
+	CONTENTS_CLIENT_ENT_FILTER  = BIT( 16 ),// filter so clientside ents and serverside ents can't collide
 
 	// contents used by utils
 	CONTENTS_AREAPORTAL			= BIT( 20 ),	// portal separating renderer areas
