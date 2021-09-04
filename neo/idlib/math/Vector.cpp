@@ -37,7 +37,6 @@ idVec5 vec5_origin( 0.0f, 0.0f, 0.0f, 0.0f, 0.0f );
 idVec6 vec6_origin( 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f );
 idVec6 vec6_infinity( idMath::INFINITY, idMath::INFINITY, idMath::INFINITY, idMath::INFINITY, idMath::INFINITY, idMath::INFINITY );
 
-
 //===============================================================
 //
 //	idVec2
@@ -352,6 +351,15 @@ void idVec3::ProjectSelfOntoSphere( const float radius )
 	}
 }
 
+idVec3 idVec3::Random()
+{
+	static idRandom rand( 0x02a3b4c5 );
+	return idVec3(
+		rand.CRandomFloat(),
+		rand.CRandomFloat(),
+		rand.CRandomFloat()
+	);
+}
 
 // RB: more about this
 // Cigolle, Donow, Evangelakos, Mara, McGuire, Meyer,

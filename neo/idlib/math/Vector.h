@@ -447,6 +447,8 @@ public:
 
 	void			Lerp( const idVec3& v1, const idVec3& v2, const float l );
 	void			SLerp( const idVec3& v1, const idVec3& v2, const float l );
+
+	static idVec3	Random();
 };
 
 extern idVec3 vec3_origin;
