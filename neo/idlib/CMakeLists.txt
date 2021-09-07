@@ -99,6 +99,9 @@ if(MSVC)
             OBJECT_DEPENDS "precompiled.pch"
             )
 
+	# Admer: Fix "cannot include precompiled.h" IntelliSense error
+	include_directories(${CMAKE_CURRENT_SOURCE_DIR})
+
     add_library(idlib ${ID_SOURCES_ALL} ${ID_INCLUDES_ALL})
 else()
 	if (USE_PRECOMPILED_HEADERS)
