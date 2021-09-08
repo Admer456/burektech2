@@ -1250,6 +1250,9 @@ void idGameLocal::ClientRunFrame( idUserCmdMgr& cmdMgr, bool lastPredictFrame, g
 		}
 	}
 
+	// Admer: run clientside ents
+	clientGame.RunFrame();
+
 	// service any pending events
 	idEvent::ServiceEvents();
 

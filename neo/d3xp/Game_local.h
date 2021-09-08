@@ -69,11 +69,14 @@ class idEditEntities;
 class idLocationEntity;
 class idMenuHandler_Shell;
 class EnvironmentProbe; // RB
+class ClientEntity; // Admer
 
 const int MAX_CLIENTS			= MAX_PLAYERS;
 const int MAX_CLIENTS_IN_PVS	= MAX_CLIENTS >> 3;
 const int GENTITYNUM_BITS		= 12;
+const int CENTITYNUM_BITS		= 13;
 const int MAX_GENTITIES			= 1 << GENTITYNUM_BITS;
+const int MAX_CENTITIES			= 1 << CENTITYNUM_BITS;
 const int ENTITYNUM_NONE		= MAX_GENTITIES - 1;
 const int ENTITYNUM_WORLD		= MAX_GENTITIES - 2;
 const int ENTITYNUM_MAX_NORMAL	= MAX_GENTITIES - 2;
@@ -109,6 +112,8 @@ void gameError( const char* fmt, ... );
 #include "vegetation/VegetationObject.hpp"
 #include "vegetation/VegetationManager.hpp"
 
+// Admer: Clientside entities yay
+#include "client/ClientGame.hpp"
 
 class idWeapon;
 
@@ -335,6 +340,7 @@ public:
 	idStr					sessionCommand;			// a target_sessionCommand can set this to return something to the session
 
 	idMultiplayerGame		mpGame;					// handles rules for standard dm
+	ClientGame				clientGame;				// cool clientside effects and stuff
 
 	VegetationManager		vegetationManager;
 	idSmokeParticles* 		smokeParticles;			// global smoke trails
@@ -940,6 +946,8 @@ const int	CINEMATIC_SKIP_DELAY	= SEC2MS( 2.0f );
 
 #include "ai/AI.h"
 #include "anim/Anim_Testmodel.h"
+
+#include "client/ClientEntity.hpp"
 
 // menus
 #include "menus/MenuWidget.h"

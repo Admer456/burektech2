@@ -402,6 +402,7 @@ void idGameLocal::Shutdown()
 
 	Shell_Cleanup();
 
+	clientGame.Shutdown();
 	mpGame.Shutdown();
 
 	MapShutdown();
@@ -2802,6 +2803,12 @@ void idGameLocal::RunFrame( idUserCmdMgr& cmdMgr, gameReturn_t& ret )
 			//}
 			//}
 
+			// Admer: run clientside ents
+			// In SP, they run here, in MP, they run in ClientRunFrame
+			if ( !common->IsMultiplayer() )
+			{
+				clientGame.RunFrame();
+			}
 
 			// remove any entities that have stopped thinking
 			if( numEntitiesToDeactivate )

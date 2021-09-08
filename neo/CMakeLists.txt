@@ -833,6 +833,9 @@ file(GLOB GAMED3XP_AI_SOURCES d3xp/ai/*.cpp)
 file(GLOB GAMED3XP_ANIM_INCLUDES d3xp/anim/*.h)
 file(GLOB GAMED3XP_ANIM_SOURCES d3xp/anim/*.cpp)
 
+file(GLOB GAMED3XP_CLIENT_INCLUDES d3xp/client/*.hpp)
+file(GLOB GAMED3XP_CLIENT_SOURCES d3xp/client/*.cpp)
+
 file(GLOB GAMED3XP_GAMESYS_INCLUDES d3xp/gamesys/*.h)
 set(GAMED3XP_GAMESYS_SOURCES
 	#d3xp/gamesys/Callbacks.cpp
@@ -1228,6 +1231,9 @@ source_group("game-d3xp\\ai" FILES ${GAMED3XP_AI_SOURCES})
 source_group("game-d3xp\\anim" FILES ${GAMED3XP_ANIM_INCLUDES})
 source_group("game-d3xp\\anim" FILES ${GAMED3XP_ANIM_SOURCES})
 
+source_group("game-d3xp\\client" FILES ${GAMED3XP_CLIENT_INCLUDES})
+source_group("game-d3xp\\client" FILES ${GAMED3XP_CLIENT_SOURCES})
+
 source_group("game-d3xp\\gamesys" FILES ${GAMED3XP_GAMESYS_INCLUDES})
 source_group("game-d3xp\\gamesys" FILES ${GAMED3XP_GAMESYS_SOURCES})
 
@@ -1376,6 +1382,7 @@ set(RBDOOM3_INCLUDES
 			
 			${GAMED3XP_INCLUDES}
 			${GAMED3XP_AI_INCLUDES} 
+			${GAMED3XP_CLIENT_INCLUDES}
 			${GAMED3XP_ANIM_INCLUDES} 
 			${GAMED3XP_GAMESYS_INCLUDES} 
 			${GAMED3XP_MENUS_INCLUDES}
@@ -1423,6 +1430,7 @@ set(RBDOOM3_SOURCES
 			
 			${GAMED3XP_SOURCES}
 			${GAMED3XP_AI_SOURCES}
+			${GAMED3XP_CLIENT_SOURCES}
 			${GAMED3XP_ANIM_SOURCES}
 			${GAMED3XP_GAMESYS_SOURCES}
 			${GAMED3XP_MENUS_SOURCES}
