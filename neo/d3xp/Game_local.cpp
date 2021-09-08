@@ -1236,6 +1236,10 @@ void idGameLocal::MapPopulate()
 	// parse the key/value pairs and spawn entities
 	SpawnMapEntities();
 
+	// Fill the map with veggies
+	Printf( "==== Populating vegetation... ====\n" );
+	vegetationManager.Populate( mapFile );
+
 	// mark location entities in all connected areas
 	SpreadLocations();
 
@@ -4084,6 +4088,13 @@ void idGameLocal::SpawnMapEntities()
 
 		mapEnt = mapFile->GetEntity( i );
 		args = mapEnt->epairs;
+		const char* className = mapEnt->epairs.GetString( "classname" );
+
+		if ( vegetationManager.IsVegetationClass( className ) ||// Ignore vegetation 
+			 clientGame.IsClientClass( className ) )			// and clientside ents
+		{
+			continue;
+		}
 
 		if( !InhibitEntitySpawn( args ) )
 		{

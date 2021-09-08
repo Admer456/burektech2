@@ -105,6 +105,10 @@ void gameError( const char* fmt, ... );
 #include "Leaderboards.h"
 #include "MultiplayerGame.h"
 
+// Admer: Vegetation yay
+#include "vegetation/VegetationObject.hpp"
+#include "vegetation/VegetationManager.hpp"
+
 
 class idWeapon;
 
@@ -332,6 +336,7 @@ public:
 
 	idMultiplayerGame		mpGame;					// handles rules for standard dm
 
+	VegetationManager		vegetationManager;
 	idSmokeParticles* 		smokeParticles;			// global smoke trails
 	idEditEntities* 		editEntities;			// in game editing
 

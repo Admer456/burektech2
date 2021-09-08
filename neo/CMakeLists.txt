@@ -854,6 +854,9 @@ file(GLOB GAMED3XP_PHYSICS_SOURCES d3xp/physics/*.cpp)
 file(GLOB GAMED3XP_SCRIPT_INCLUDES d3xp/script/*.h)
 file(GLOB GAMED3XP_SCRIPT_SOURCES d3xp/script/*.cpp)
 
+file(GLOB GAMED3XP_VEGEGATION_INCLUDES d3xp/vegetation/*.hpp)
+file(GLOB GAMED3XP_VEGEGATION_SOURCES d3xp/vegetation/*.cpp)
+
 file(GLOB COMPILER_INCLUDES tools/compilers/*.h)
 
 file(GLOB COMPILER_AAS_INCLUDES tools/compilers/aas/*.h)
@@ -1237,7 +1240,8 @@ source_group("game-d3xp\\physics" FILES ${GAMED3XP_PHYSICS_SOURCES})
 source_group("game-d3xp\\script" FILES ${GAMED3XP_SCRIPT_INCLUDES})
 source_group("game-d3xp\\script" FILES ${GAMED3XP_SCRIPT_SOURCES})
 
-
+source_group("game-d3xp\\vegetation" FILES ${GAMED3XP_VEGEGATION_INCLUDES})
+source_group("game-d3xp\\vegetation" FILES ${GAMED3XP_VEGEGATION_SOURCES})
 
 
 source_group("sys\\win32" FILES ${WIN32_INCLUDES})
@@ -1377,6 +1381,7 @@ set(RBDOOM3_INCLUDES
 			${GAMED3XP_MENUS_INCLUDES}
 			${GAMED3XP_PHYSICS_INCLUDES}
 			${GAMED3XP_SCRIPT_INCLUDES}
+			${GAMED3XP_VEGEGATION_INCLUDES}
 			)
 			
 set(RBDOOM3_SOURCES
@@ -1423,6 +1428,7 @@ set(RBDOOM3_SOURCES
 			${GAMED3XP_MENUS_SOURCES}
 			${GAMED3XP_PHYSICS_SOURCES}
 			${GAMED3XP_SCRIPT_SOURCES}
+			${GAMED3XP_VEGEGATION_SOURCES}
 			)
 
 add_definitions(-DUSE_DOOMCLASSIC)

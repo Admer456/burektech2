@@ -34,7 +34,9 @@ If you have questions concerning this license or the applicable additional terms
 #include "BoundsTrack.h"
 
 // assume any lightDef or entityDef index above this is an internal error
-const int LUDICROUS_INDEX	= 10000;
+// Admer: Upped from 10k to 70k to take into account the vegetation system.
+//        Might be brought back to 10k again, when we bring in instanced rendering
+const int LUDICROUS_INDEX	= 70000;
 
 
 typedef struct portal_s
