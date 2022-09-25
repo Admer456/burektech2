@@ -1240,6 +1240,7 @@ void idGameLocal::MapPopulate()
 	// Fill the map with veggies
 	Printf( "==== Populating vegetation... ====\n" );
 	vegetationManager.Populate( mapFile );
+	Printf( "==== Spawned %i vegetation objects ====\n", vegetationManager.Count() );
 
 	// mark location entities in all connected areas
 	SpreadLocations();
