@@ -752,7 +752,7 @@ void R_AddSingleModel( viewEntity_t* vEntity )
 		// than the entire entity reference bounds
 		// If the entire model wasn't visible, there is no need to check the
 		// individual surfaces.
-		const bool surfaceDirectlyVisible = (modelIsVisible && !idRenderMatrix::CullBoundsToMVP( vEntity->mvp, tri->bounds )) || isWeapon;
+		const bool surfaceDirectlyVisible = isWeapon ? true : (modelIsVisible && !idRenderMatrix::CullBoundsToMVP( vEntity->mvp, tri->bounds ));
 
 		// RB: added check wether GPU skinning is available at all
 		const bool gpuSkinned = ( tri->staticModelWithJoints != NULL && r_useGPUSkinning.GetBool() && glConfig.gpuSkinningAvailable );
