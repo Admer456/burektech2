@@ -398,6 +398,7 @@ void R_AddSingleModel( viewEntity_t* vEntity )
 	// calculate the znear for testing whether or not the view is inside a shadow projection
 	const float znear = ( viewDef->renderView.cramZNear ) ? ( r_znear.GetFloat() * 0.25f ) : r_znear.GetFloat();
 
+
 	// if the entity wasn't seen through a portal chain, it was added just for light shadows
 	const bool modelIsVisible = !vEntity->scissorRect.IsEmpty();
 	const bool addInteractions = modelIsVisible && ( !viewDef->isXraySubview || entityDef->parms.xrayIndex == 2 );
@@ -743,11 +744,15 @@ void R_AddSingleModel( viewEntity_t* vEntity )
 			}
 		}
 
+		// Admer: weapons are always visible (and they seem to be the only ones that use the weapon FOV and depth hacks)
+		//        I once had trouble with suddenly disappearing viewmodels
+		const bool isWeapon = renderEntity->weaponFov && renderEntity->weaponDepthHack;
+
 		// view frustum culling for the precise surface bounds, which is tighter
 		// than the entire entity reference bounds
 		// If the entire model wasn't visible, there is no need to check the
 		// individual surfaces.
-		const bool surfaceDirectlyVisible = modelIsVisible && !idRenderMatrix::CullBoundsToMVP( vEntity->mvp, tri->bounds );
+		const bool surfaceDirectlyVisible = (modelIsVisible && !idRenderMatrix::CullBoundsToMVP( vEntity->mvp, tri->bounds )) || isWeapon;
 
 		// RB: added check wether GPU skinning is available at all
 		const bool gpuSkinned = ( tri->staticModelWithJoints != NULL && r_useGPUSkinning.GetBool() && glConfig.gpuSkinningAvailable );
