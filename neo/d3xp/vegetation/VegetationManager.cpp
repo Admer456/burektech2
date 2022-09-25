@@ -148,7 +148,7 @@ void VegetationManager::SpawnCircle( const idDict& spawnArgs )
 		if ( CalculateTransformData( spawnArgs, origin, axis ) )
 		{
 			// Set a random model
-			spawnArgsCopy.GetString( "model", modelStringList[rand.RandomInt( numModelVariations )] );
+			spawnArgsCopy.Set( "model", modelStringList[rand.RandomInt( numModelVariations )] );
 
 			SpawnObject( origin, axis, spawnArgsCopy );
 		}
@@ -212,8 +212,8 @@ bool VegetationManager::CalculateTransformData( const idDict& spawnArgs, idVec3&
 
 	// Scale
 	{
-		float scale = spawnArgs.GetFloat( "scale", -1.2f );
-		float minScale = spawnArgs.GetFloat( "minScale", 0.7f );
+		float scale = spawnArgs.GetFloat( "scale", -2.5f );
+		float minScale = spawnArgs.GetFloat( "minScale", 0.2f );
 		// Negative = random range from 0 to abs(scale)
 		if ( scale < 0 )
 		{
@@ -251,7 +251,7 @@ bool VegetationManager::CalculateTransformData( const idDict& spawnArgs, idVec3&
 
 			// This code is untested, let's leave it out for now
 #if 0
-	// Also align the vegetation object along the surface normal
+			// Also align the vegetation object along the surface normal
 			const idVec3 up = idVec3( 0.0f, 0.0f, 1.0f );
 			const idVec3& normal = results.c.normal;
 			float normalAngle = idMath::ACos( normal * up ) * idMath::M_RAD2DEG;
@@ -277,6 +277,8 @@ int VegetationManager::ModelVariations( const idDict& spawnArgs, VariationList& 
 	{
 		return 0;
 	}
+
+	outStringList.Append( spawnArgs.GetString( "model" ) );
 
 	int count = 2;
 	while ( count < 8 )
