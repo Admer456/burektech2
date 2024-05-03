@@ -1,3 +1,5 @@
+*Note: This project is abandoned; all my engine dev effort is now focused on [Elegy Engine](https://github.com/ElegyEngine/ElegyEngine).*
+
 # BUREKTech 2.0
 
 BUREKTech, BT for short, is a work-in-progress fork of RBDoom3, that will bring to the table some nice little things for people like me - who aren't happy with popular modern engines - but wanna make games nevertheless.  
